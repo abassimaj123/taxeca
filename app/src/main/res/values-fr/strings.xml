@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TaxeCA</string>
+
+    <!-- Navigation tabs -->
+    <string name="tab_calculator">Calculatrice</string>
+    <string name="tab_history">Historique</string>
+
+    <!-- Labels -->
+    <string name="label_province">Province / Territoire</string>
+    <string name="label_amount">Montant</string>
+    <string name="label_mode_forward">Avant</string>
+    <string name="label_mode_reverse">Inverse</string>
+
+    <!-- Tax labels -->
+    <string name="label_gst">TPS</string>
+    <string name="label_pst">TVP</string>
+    <string name="label_qst">TVQ</string>
+    <string name="label_rst">TDV</string>
+    <string name="label_hst">TVH</string>
+
+    <!-- Tax labels with rate placeholders -->
+    <string name="label_gst_with_rate">TPS (%1$s)</string>
+    <string name="label_pst_with_rate">TVP (%1$s)</string>
+    <string name="label_qst_with_rate">TVQ (%1$s)</string>
+    <string name="label_rst_with_rate">TDV (%1$s)</string>
+    <string name="label_hst_with_rate">TVH (%1$s)</string>
+
+    <!-- Result labels -->
+    <string name="label_total_tax">Total des taxes</string>
+    <string name="label_total">Total</string>
+    <string name="label_base_amount">Montant de base</string>
+
+    <!-- Buttons -->
+    <string name="btn_calculate">Calculer</string>
+    <string name="btn_share">Partager</string>
+    <string name="btn_save">Enregistrer</string>
+    <string name="btn_clear_all">Tout effacer</string>
+    <string name="btn_delete">Supprimer</string>
+
+    <!-- Hints -->
+    <string name="hint_enter_amount">Entrez le montant</string>
+
+    <!-- Split -->
+    <string name="calculator_split_toggle">Diviser la note</string>
+    <string name="calculator_per_person">Par personne (÷%1$d)</string>
+
+    <!-- Save feedback -->
+    <string name="btn_saved">✓ Enregistré</string>
+
+    <!-- History modes -->
+    <string name="history_mode_shopping">Liste</string>
+    <string name="history_mode_restaurant">Restaurant</string>
+    <string name="history_mode_forward">Avant</string>
+    <string name="history_mode_reverse">Inverse</string>
+
+    <!-- History -->
+    <string name="history_empty">Aucun calcul enregistré pour l\'instant.</string>
+    <string name="history_deleted">Entrée supprimée.</string>
+    <string name="btn_back">Retour</string>
+    <string name="history_delete_title">Supprimer ce calcul ?</string>
+    <string name="history_deleteall_title">Effacer tout l\'historique ?</string>
+    <string name="history_deleteall_confirm">Effacer tout</string>
+
+    <!-- Restaurant item mode -->
+    <string name="restaurant_item_mode">Entrer les articles</string>
+    <string name="restaurant_items_subtotal">Sous-total articles</string>
+
+    <!-- History detail -->
+    <string name="history_detail_items">Articles</string>
+    <string name="history_detail_paid">Prix payé (avec taxes)</string>
+    <string name="history_detail_before_tax">Montant avant taxes</string>
+    <string name="history_detail_items_subtotal">Sous-total articles</string>
+    <string name="history_detail_meal_subtotal">Sous-total repas</string>
+    <string name="history_detail_tip">Pourboire / Tip</string>
+    <string name="history_detail_per_person">Par personne (÷%1$d)</string>
+
+    <!-- Premium unlock button (always visible) -->
+    <string name="premium_unlock_btn">🔓 Débloquer 1h premium</string>
+
+    <!-- Freemium gate -->
+    <string name="freemium_gate_title">Essai terminé</string>
+    <string name="freemium_gate_message">Regardez une courte pub pour déverrouiller cette fonction pendant 60 minutes.</string>
+    <string name="freemium_watch_ad">Voir la pub</string>
+    <string name="freemium_loading_ad">Chargement…</string>
+
+    <!-- Navigation tabs -->
+    <string name="tab_shopping">Liste</string>
+    <string name="tab_restaurant">Restaurant</string>
+
+    <!-- Shopping mode -->
+    <string name="shopping_add_item">Ajouter un article</string>
+    <string name="shopping_add_btn">Ajouter</string>
+    <string name="shopping_item_name">Nom de l\'article</string>
+    <string name="shopping_item_name_optional">Nom (facultatif)</string>
+    <string name="shopping_item_price">Prix</string>
+    <string name="shopping_items_count">%1$d article(s)</string>
+    <string name="shopping_summary">Résumé</string>
+    <string name="shopping_grand_total">Total général</string>
+    <string name="shopping_clear_title">Effacer la liste ?</string>
+    <string name="shopping_clear_message">Tous les articles seront supprimés.</string>
+    <string name="shopping_clear_ok">Effacer</string>
+    <string name="shopping_subtotal">Sous-total</string>
+
+    <!-- Restaurant mode -->
+    <string name="restaurant_subtotal_hint">Sous-total (avant taxes)</string>
+    <string name="restaurant_tip_label">Pourboire</string>
+    <string name="restaurant_tip_custom">Personnalisé</string>
+    <string name="calculator_tip_toggle">Inclure pourboire</string>
+    <string name="calculator_tip_percent">Pourboire %</string>
+    <string name="restaurant_tip_custom_hint">Pourboire personnalisé (%)</string>
+    <string name="restaurant_tip_with_rate">Pourboire (%1$s)</string>
+    <string name="restaurant_split_label">Diviser l\'addition</string>
+    <string name="restaurant_no_split">Sans division</string>
+    <string name="restaurant_split_custom_hint">Nombre de personnes</string>
+    <string name="restaurant_per_person">Par personne (÷%1$d)</string>
+
+    <!-- Province names (French) -->
+    <string name="province_ab">Alberta</string>
+    <string name="province_bc">Colombie-Britannique</string>
+    <string name="province_mb">Manitoba</string>
+    <string name="province_nb">Nouveau-Brunswick</string>
+    <string name="province_nl">Terre-Neuve-et-Labrador</string>
+    <string name="province_nt">Territoires du Nord-Ouest</string>
+    <string name="province_ns">Nouvelle-Écosse</string>
+    <string name="province_nu">Nunavut</string>
+    <string name="province_on">Ontario</string>
+    <string name="province_pe">Île-du-Prince-Édouard</string>
+    <string name="province_qc">Québec</string>
+    <string name="province_sk">Saskatchewan</string>
+    <string name="province_yt">Yukon</string>
+</resources>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TaxeCA</string>
+
+    <!-- Navigation tabs -->
+    <string name="tab_calculator">Calculator</string>
+    <string name="tab_history">History</string>
+
+    <!-- Labels -->
+    <string name="label_province">Province / Territory</string>
+    <string name="label_amount">Amount</string>
+    <string name="label_mode_forward">Forward</string>
+    <string name="label_mode_reverse">Reverse</string>
+
+    <!-- Tax labels -->
+    <string name="label_gst">GST</string>
+    <string name="label_pst">PST</string>
+    <string name="label_qst">QST</string>
+    <string name="label_rst">RST</string>
+    <string name="label_hst">HST</string>
+
+    <!-- Tax labels with rate placeholders -->
+    <string name="label_gst_with_rate">GST (%1$s)</string>
+    <string name="label_pst_with_rate">PST (%1$s)</string>
+    <string name="label_qst_with_rate">QST (%1$s)</string>
+    <string name="label_rst_with_rate">RST (%1$s)</string>
+    <string name="label_hst_with_rate">HST (%1$s)</string>
+
+    <!-- Result labels -->
+    <string name="label_total_tax">Total Tax</string>
+    <string name="label_total">Total</string>
+    <string name="label_base_amount">Base Amount</string>
+
+    <!-- Buttons -->
+    <string name="btn_calculate">Calculate</string>
+    <string name="btn_share">Share</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_clear_all">Clear All</string>
+    <string name="btn_delete">Delete</string>
+
+    <!-- Hints -->
+    <string name="hint_enter_amount">Enter amount</string>
+
+    <!-- Split -->
+    <string name="calculator_split_toggle">Split bill</string>
+    <string name="calculator_per_person">Per person (÷%1$d)</string>
+
+    <!-- Save feedback -->
+    <string name="btn_saved">✓ Saved</string>
+
+    <!-- History modes -->
+    <string name="history_mode_shopping">Shopping</string>
+    <string name="history_mode_restaurant">Restaurant</string>
+    <string name="history_mode_forward">Forward</string>
+    <string name="history_mode_reverse">Reverse</string>
+
+    <!-- History -->
+    <string name="history_empty">No calculations saved yet.</string>
+    <string name="history_deleted">Entry deleted.</string>
+    <string name="btn_back">Back</string>
+    <string name="history_delete_title">Delete this entry?</string>
+    <string name="history_deleteall_title">Clear all history?</string>
+    <string name="history_deleteall_confirm">Clear all</string>
+
+    <!-- Restaurant item mode -->
+    <string name="restaurant_item_mode">Enter items</string>
+    <string name="restaurant_items_subtotal">Items subtotal</string>
+
+    <!-- History detail -->
+    <string name="history_detail_items">Items</string>
+    <string name="history_detail_paid">Amount paid (with tax)</string>
+    <string name="history_detail_before_tax">Amount before tax</string>
+    <string name="history_detail_items_subtotal">Items subtotal</string>
+    <string name="history_detail_meal_subtotal">Meal subtotal</string>
+    <string name="history_detail_tip">Tip / Pourboire</string>
+    <string name="history_detail_per_person">Per person (÷%1$d)</string>
+
+    <!-- Premium unlock button (always visible) -->
+    <string name="premium_unlock_btn">🔓 Unlock 1h premium</string>
+
+    <!-- Freemium gate -->
+    <string name="freemium_gate_title">Trial ended</string>
+    <string name="freemium_gate_message">Watch a short ad to unlock this feature for 60 minutes.</string>
+    <string name="freemium_watch_ad">Watch Ad</string>
+    <string name="freemium_loading_ad">Loading ad…</string>
+
+    <!-- Navigation tabs -->
+    <string name="tab_shopping">Shopping</string>
+    <string name="tab_restaurant">Restaurant</string>
+
+    <!-- Shopping mode -->
+    <string name="shopping_add_item">Add Item</string>
+    <string name="shopping_add_btn">Add</string>
+    <string name="shopping_item_name">Item name</string>
+    <string name="shopping_item_name_optional">Name (optional)</string>
+    <string name="shopping_item_price">Price</string>
+    <string name="shopping_items_count">%1$d item(s)</string>
+    <string name="shopping_summary">Summary</string>
+    <string name="shopping_grand_total">Grand Total</string>
+    <string name="shopping_clear_title">Clear list?</string>
+    <string name="shopping_clear_message">All items will be permanently deleted.</string>
+    <string name="shopping_clear_ok">Clear</string>
+    <string name="shopping_subtotal">Subtotal</string>
+
+    <!-- Restaurant mode -->
+    <string name="restaurant_subtotal_hint">Bill subtotal (before tax)</string>
+    <string name="restaurant_tip_label">Tip</string>
+    <string name="restaurant_tip_custom">Custom</string>
+    <string name="calculator_tip_toggle">Include tip</string>
+    <string name="calculator_tip_percent">Tip %</string>
+    <string name="restaurant_tip_custom_hint">Custom tip (%)</string>
+    <string name="restaurant_tip_with_rate">Tip (%1$s)</string>
+    <string name="restaurant_split_label">Split bill</string>
+    <string name="restaurant_no_split">No split</string>
+    <string name="restaurant_split_custom_hint">Number of people</string>
+    <string name="restaurant_per_person">Per person (÷%1$d)</string>
+
+    <!-- Province names (English) -->
+    <string name="province_ab">Alberta</string>
+    <string name="province_bc">British Columbia</string>
+    <string name="province_mb">Manitoba</string>
+    <string name="province_nb">New Brunswick</string>
+    <string name="province_nl">Newfoundland &amp; Labrador</string>
+    <string name="province_nt">Northwest Territories</string>
+    <string name="province_ns">Nova Scotia</string>
+    <string name="province_nu">Nunavut</string>
+    <string name="province_on">Ontario</string>
+    <string name="province_pe">Prince Edward Island</string>
+    <string name="province_qc">Quebec</string>
+    <string name="province_sk">Saskatchewan</string>
+    <string name="province_yt">Yukon</string>
+</resources>

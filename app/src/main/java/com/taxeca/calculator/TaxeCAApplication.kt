@@ -8,6 +8,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
 import java.util.Locale
+import kotlin.system.exitProcess
 
 @HiltAndroidApp
 class TaxeCAApplication : Application() {
@@ -16,11 +17,21 @@ class TaxeCAApplication : Application() {
         if (AdConfig.ADS_ENABLED) MobileAds.initialize(this)
 
         // Crashlytics — désactivé en debug pour éviter le bruit
-        FirebaseCrashlytics.getInstance()
-            .setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
+        val crashlytics = FirebaseCrashlytics.getInstance()
+        crashlytics.setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
 
-        // Langue de l'app — loggée une fois au démarrage
-        FirebaseAnalytics.getInstance(this).logEvent("app_language", Bundle().apply {
+        // Hook uncaught exceptions → Crashlytics
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            crashlytics.recordException(throwable)
+            defaultHandler?.uncaughtException(thread, throwable)
+            exitProcess(1)
+        }
+
+        // Langue de l'app + app_open loggés au démarrage
+        val fa = FirebaseAnalytics.getInstance(this)
+        fa.logEvent("app_open", null)
+        fa.logEvent("app_language", Bundle().apply {
             putString("language", Locale.getDefault().language)
         })
     }

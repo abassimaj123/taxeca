@@ -63,6 +63,20 @@
 -keep class com.google.firebase.analytics.** { *; }
 -dontwarn com.google.firebase.analytics.**
 
+# ---- AdMob / Google Mobile Ads ----
+-keep class com.google.android.gms.ads.** { *; }
+-dontwarn com.google.android.gms.ads.**
+-keep class com.google.ads.** { *; }
+-dontwarn com.google.ads.**
+
+# ---- BillingClient (Play Billing) ----
+-keep class com.android.billingclient.** { *; }
+-dontwarn com.android.billingclient.**
+
+# ---- Play Review ----
+-keep class com.google.android.play.core.review.** { *; }
+-dontwarn com.google.android.play.core.review.**
+
 # ---- General Android ----
 -keepattributes SourceFile, LineNumberTable
 -renamesourcefileattribute SourceFile

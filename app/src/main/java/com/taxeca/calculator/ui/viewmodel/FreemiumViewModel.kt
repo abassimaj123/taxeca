@@ -9,13 +9,17 @@ import androidx.lifecycle.viewModelScope
 import com.taxeca.calculator.data.repository.FreemiumRepository
 import com.taxeca.calculator.ui.ads.AdConfig
 import com.taxeca.calculator.ui.ads.AdManager
+import com.taxeca.calculator.ui.ads.IAPManager
+import com.taxeca.calculator.ui.ads.ReviewManager
 import com.taxeca.calculator.ui.analytics.AnalyticsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,78 +27,166 @@ import javax.inject.Inject
 class FreemiumViewModel @Inject constructor(
     private val freemiumRepo: FreemiumRepository,
     private val adManager: AdManager,
+    private val iapManager: IAPManager,
+    private val reviewManager: ReviewManager,
     private val analytics: AnalyticsManager
 ) : ViewModel() {
 
-    private var trialExpiredLogged = false
+    // ── State ─────────────────────────────────────────────────────────────────
 
-    private val _hasAccess   = MutableStateFlow(!AdConfig.ADS_ENABLED)
+    val isPremium: StateFlow<Boolean> = iapManager.isPremium
+    val premiumPrice: StateFlow<String?> = iapManager.premiumPrice
+
+    private val _isRewardedActive = MutableStateFlow(false)
+    val isRewardedActive: StateFlow<Boolean> = _isRewardedActive.asStateFlow()
+
+    // Milliseconds remaining in rewarded session (0 = expired)
+    private val _rewardedTimeLeftMs = MutableStateFlow(0L)
+    val rewardedTimeLeftMs: StateFlow<Long> = _rewardedTimeLeftMs.asStateFlow()
+
+    // hasAccess = premium OR rewarded active
+    private val _hasAccess = MutableStateFlow(!AdConfig.ADS_ENABLED)
     val hasAccess: StateFlow<Boolean> = _hasAccess.asStateFlow()
 
     private val _isLoadingAd = MutableStateFlow(false)
     val isLoadingAd: StateFlow<Boolean> = _isLoadingAd.asStateFlow()
 
+    // true only when session is expired AND daily limit not reached
+    private val _canWatchRewarded = MutableStateFlow(false)
+    val canWatchRewarded: StateFlow<Boolean> = _canWatchRewarded.asStateFlow()
+
+    private val _adUnavailable = MutableStateFlow(false)
+    val adUnavailable: StateFlow<Boolean> = _adUnavailable.asStateFlow()
+
+    private val _iapError = MutableStateFlow<String?>(null)
+    val iapError: StateFlow<String?> = _iapError.asStateFlow()
+
+    // ── Session-based paywall trigger ──────────────────────────────────────────
+    private val _showPaywall = MutableStateFlow(false)
+    val showPaywall: StateFlow<Boolean> = _showPaywall.asStateFlow()
+
+    /** true when paywall is triggered at session 7+ (hard gate — dismiss at 50% opacity). */
+    private val _isHardPaywall = MutableStateFlow(false)
+    val isHardPaywall: StateFlow<Boolean> = _isHardPaywall.asStateFlow()
+
+    private var _sessionCount     = 0
+    private var _actionCount      = 0
+    private var _shownThisSession = false
+
+    private var expiryJob: Job? = null
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+
     init {
+        adManager.preloadInterstitial()
+        startExpiryTimer()
+        // Observe isPremium changes → update hasAccess
         viewModelScope.launch {
-            val isFirstTime = freemiumRepo.firstLaunchDate.first() == 0L
-            freemiumRepo.ensureFirstLaunch()
-            if (isFirstTime) analytics.log("trial_started")
-        }
-        viewModelScope.launch {
-            combine(
-                freemiumRepo.firstLaunchDate,
-                freemiumRepo.rewardedUnlockedAt
-            ) { firstLaunch, rewardedAt ->
-                val trialActive    = freemiumRepo.isTrialActive(firstLaunch)
-                val rewardedActive = freemiumRepo.isRewardedActive(rewardedAt)
-                Log.d("Trial",
-                    "firstLaunch=$firstLaunch " +
-                    "trialActive=$trialActive " +
-                    "rewardedAt=$rewardedAt " +
-                    "rewardedActive=$rewardedActive " +
-                    "→ hasAccess=${trialActive || rewardedActive}"
-                )
-                if (!trialActive && !rewardedActive && !trialExpiredLogged) {
-                    trialExpiredLogged = true
-                    analytics.log("trial_expired")
-                }
-                trialActive || rewardedActive
-            }.collect { access ->
-                analytics.setKey("trial_active", access)
-                _hasAccess.value = access
+            iapManager.isPremium.collect { premium ->
+                if (premium) _hasAccess.value = true
             }
         }
-        adManager.preloadInterstitial()
     }
 
-    // ── Gated access (Share / History) ────────────────────────────────────────
+    private fun startExpiryTimer() {
+        expiryJob?.cancel()
+        expiryJob = viewModelScope.launch {
+            while (isActive) {
+                refreshRewardedState()
+                delay(30_000L) // check every 30 seconds
+            }
+        }
+    }
 
-    /**
-     * Request access to a gated feature (Share / History).
-     * If already active → calls [onGranted] immediately.
-     * Otherwise loads rewarded ad → grants 60 min on success.
-     * If no ad available → grants free access.
-     */
-    fun requestAccess(context: Context, onGranted: () -> Unit) {
-        if (_hasAccess.value) {
-            onGranted()
+    private suspend fun refreshRewardedState() {
+        val rewardedAt = freemiumRepo.rewardedUnlockedAt.first()
+        val active = freemiumRepo.isRewardedActive(rewardedAt)
+        _isRewardedActive.value = active
+        _rewardedTimeLeftMs.value = if (active) {
+            val expiry = rewardedAt + 60L * 60 * 1000
+            maxOf(0L, expiry - System.currentTimeMillis())
+        } else 0L
+        _hasAccess.value = iapManager.isPremium.value || active || !AdConfig.ADS_ENABLED
+        _canWatchRewarded.value = !iapManager.isPremium.value && freemiumRepo.canWatchRewarded()
+    }
+
+    /** Call once per app launch. */
+    fun recordSession() {
+        if (iapManager.isPremium.value) return
+        viewModelScope.launch {
+            _sessionCount = freemiumRepo.incrementSession()
+            _actionCount = 0
+            _shownThisSession = false
+        }
+    }
+
+    /** Call on meaningful actions: tab switches, calculations.
+     *  Shows paywall at most once per session. */
+    fun recordAction() {
+        if (iapManager.isPremium.value) return
+        if (_shownThisSession) return
+        if (_sessionCount == 0) return   // session not yet recorded
+
+        _actionCount++
+
+        // Sessions 1-3: free exploration
+        if (_sessionCount <= 3) return
+
+        // Sessions 4-6: gentle nudge after 5 actions
+        if (_sessionCount <= 6 && _actionCount >= 5) {
+            _shownThisSession = true
+            _isHardPaywall.value = false
+            analytics.log("paywall_shown", "type" to "soft")
+            _showPaywall.value = true
             return
         }
-        val activity = context.findActivity() ?: run { onGranted(); return }
+
+        // Sessions 7+: stronger nudge after 4 actions
+        if (_sessionCount >= 7 && _actionCount >= 4) {
+            _shownThisSession = true
+            _isHardPaywall.value = true
+            analytics.log("paywall_shown", "type" to "hard")
+            _showPaywall.value = true
+        }
+    }
+
+    fun dismissPaywall() {
+        _showPaywall.value = false
+        _isHardPaywall.value = false
+    }
+
+    fun logTabChanged(tab: String) = analytics.log("tab_changed", "tab" to tab)
+
+    val shouldShowRewardedShield: Boolean get() = _sessionCount >= 2 && !iapManager.isPremium.value
+
+    override fun onCleared() {
+        super.onCleared()
+        expiryJob?.cancel()
+    }
+
+    // ── Gated access ──────────────────────────────────────────────────────────
+
+    /**
+     * Request access to a gated feature.
+     * If premium or rewarded active → calls [onGranted] immediately.
+     * Otherwise shows rewarded ad. Does NOT grant free access if ad fails.
+     */
+    fun requestAccess(context: Context, onGranted: () -> Unit) {
+        if (_hasAccess.value) { onGranted(); return }
+        val activity = context.findActivity() ?: return
         _isLoadingAd.value = true
         adManager.loadRewarded(
             onLoaded = { ad ->
                 _isLoadingAd.value = false
                 analytics.log("rewarded_ad_shown")
                 adManager.showRewarded(
-                    ad       = ad,
+                    ad = ad,
                     activity = activity,
                     onRewarded = {
                         analytics.log("rewarded_ad_completed")
-                        analytics.log("rewarded_access_granted")
                         viewModelScope.launch {
-                            freemiumRepo.setRewardedUnlockedAt()
-                            _hasAccess.value = true
+                            freemiumRepo.recordRewardedWatch()
+                            refreshRewardedState()
                             onGranted()
                         }
                     },
@@ -102,41 +194,33 @@ class FreemiumViewModel @Inject constructor(
                 )
             },
             onFailed = {
-                // Ad unavailable — grant access for free
+                // Ad not available — do NOT grant free access; show error to user
                 _isLoadingAd.value = false
-                viewModelScope.launch {
-                    freemiumRepo.setRewardedUnlockedAt()
-                    _hasAccess.value = true
-                    onGranted()
-                }
+                _adUnavailable.value = true
+                Log.d("FreemiumVM", "Rewarded ad unavailable — access denied")
             }
         )
     }
 
-    // ── Voluntary "Débloquer 1h premium" button ───────────────────────────────
+    // ── Voluntary bonus watch ─────────────────────────────────────────────────
 
-    /**
-     * User voluntarily watches a rewarded ad to get/extend 60-min premium access.
-     * Unlike [requestAccess], does NOT grant free access if the ad fails to load
-     * (this is an optional bonus action, not a gate).
-     */
     fun watchRewardedForBonus(context: Context) {
+        if (!_canWatchRewarded.value) return          // session active OR daily limit hit
         val activity = context.findActivity() ?: return
         _isLoadingAd.value = true
+        _adUnavailable.value = false
         adManager.loadRewarded(
             onLoaded = { ad ->
                 _isLoadingAd.value = false
                 analytics.log("rewarded_ad_shown")
                 adManager.showRewarded(
-                    ad       = ad,
+                    ad = ad,
                     activity = activity,
                     onRewarded = {
                         analytics.log("rewarded_ad_completed")
-                        analytics.log("rewarded_access_granted")
                         viewModelScope.launch {
-                            freemiumRepo.setRewardedUnlockedAt()
-                            _hasAccess.value = true
-                            Log.d("Trial", "watchRewardedForBonus: 60 min unlocked")
+                            freemiumRepo.recordRewardedWatch()
+                            refreshRewardedState()
                         }
                     },
                     onDismissedWithoutReward = {}
@@ -144,19 +228,58 @@ class FreemiumViewModel @Inject constructor(
             },
             onFailed = {
                 _isLoadingAd.value = false
-                Log.d("Trial", "watchRewardedForBonus: no ad available")
+                _adUnavailable.value = true
             }
         )
     }
 
-    // ── Interstitial tracking ─────────────────────────────────────────────────
+    fun clearAdUnavailable() { _adUnavailable.value = false }
+    fun clearIapError()      { _iapError.value = null }
 
-    /**
-     * Call after each calculation result.
-     * Shows interstitial after 5 calculations with a 5-minute cooldown.
-     */
+    // ── IAP ───────────────────────────────────────────────────────────────────
+
+    fun buyPremium(activity: Activity) {
+        analytics.log("iap_purchase_started")
+        iapManager.launchPurchase(
+            activity = activity,
+            onSuccess = {
+                analytics.log("iap_purchase_success")
+                analytics.setUserProperty("is_premium", "true")
+                _hasAccess.value = true
+                reviewManager.maybeRequestReview(activity)
+            },
+            onError = { reason ->
+                if (reason != "cancelled") {
+                    analytics.log("iap_purchase_error")
+                    _iapError.value = reason
+                }
+            }
+        )
+    }
+
+    fun restorePurchases(activity: Activity) {
+        iapManager.restorePurchases(
+            onSuccess = {
+                analytics.log("iap_restore_success")
+                _hasAccess.value = true
+            },
+            onNone = {
+                analytics.log("iap_restore_none")
+            }
+        )
+    }
+
+    // ── Review ────────────────────────────────────────────────────────────────
+
+    fun maybeRequestReview(activity: Activity) {
+        reviewManager.maybeRequestReview(activity)
+    }
+
+    // ── Interstitial ──────────────────────────────────────────────────────────
+
     fun trackCalculation(context: Context) {
         val activity = context.findActivity() ?: return
+        if (iapManager.isPremium.value || _isRewardedActive.value) return // no ads during premium or rewarded session
         adManager.onCalculation(activity)
     }
 

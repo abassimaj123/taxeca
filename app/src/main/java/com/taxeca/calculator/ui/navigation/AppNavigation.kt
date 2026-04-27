@@ -12,9 +12,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.WorkspacePremium
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -25,8 +30,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -44,25 +53,31 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.taxeca.calculator.R
+import com.taxeca.calculator.data.repository.LanguageManager
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.taxeca.calculator.ui.components.UnlockBottomSheet
 import com.taxeca.calculator.ui.screens.CalculatorScreen
 import com.taxeca.calculator.ui.screens.HistoryDetailScreen
 import com.taxeca.calculator.ui.screens.HistoryScreen
 import com.taxeca.calculator.ui.screens.RestaurantScreen
+import com.taxeca.calculator.ui.screens.SettingsScreen
 import com.taxeca.calculator.ui.screens.ShoppingScreen
 import com.taxeca.calculator.ui.theme.GradientEnd
 import com.taxeca.calculator.ui.theme.GradientMid
 import com.taxeca.calculator.ui.theme.GradientStart
 import com.taxeca.calculator.ui.viewmodel.FreemiumViewModel
+import com.taxeca.calculator.ui.viewmodel.SettingsViewModel
 
 val LocalFreemiumViewModel = compositionLocalOf<FreemiumViewModel> {
     error("FreemiumViewModel not provided")
 }
 
 sealed class Screen(val route: String) {
-    data object Calculator   : Screen("calculator")
-    data object Shopping     : Screen("shopping")
-    data object Restaurant   : Screen("restaurant")
-    data object History      : Screen("history")
+    data object Calculator    : Screen("calculator")
+    data object Shopping      : Screen("shopping")
+    data object Restaurant    : Screen("restaurant")
+    data object History       : Screen("history")
+    data object Settings      : Screen("settings")
     data object HistoryDetail : Screen("history_detail/{entryId}") {
         fun route(id: Long) = "history_detail/$id"
     }
@@ -83,6 +98,7 @@ private val headerGradient = Brush.horizontalGradient(
 fun AppNavigation() {
     val navController  = rememberNavController()
     val freemiumVm: FreemiumViewModel = hiltViewModel()
+    val settingsVm: SettingsViewModel = hiltViewModel()
 
     val navItems = listOf(
         NavItem(Screen.Calculator, Icons.Default.Calculate,    R.string.tab_calculator),
@@ -94,6 +110,24 @@ fun AppNavigation() {
     val navBackStackEntry    by navController.currentBackStackEntryAsState()
     val currentDestination   = navBackStackEntry?.destination
     val isOnHistoryDetail    = currentDestination?.route?.startsWith("history_detail") == true
+    val isOnSettings         = currentDestination?.route == Screen.Settings.route
+
+    val isPremium by freemiumVm.isPremium.collectAsStateWithLifecycle()
+
+    // Record session once per launch
+    LaunchedEffect(Unit) { freemiumVm.recordSession() }
+
+    // Observe paywall trigger
+    val showPaywall by freemiumVm.showPaywall.collectAsStateWithLifecycle()
+    var paywallVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(showPaywall) { if (showPaywall) paywallVisible = true }
+
+    if (paywallVisible) {
+        UnlockBottomSheet(onDismiss = {
+            paywallVisible = false
+            freemiumVm.dismissPaywall()
+        })
+    }
 
     CompositionLocalProvider(LocalFreemiumViewModel provides freemiumVm) {
         Scaffold(
@@ -126,6 +160,58 @@ fun AppNavigation() {
                                 )
                             }
                         },
+                        actions = {
+                            if (freemiumVm.shouldShowRewardedShield) {
+                                IconButton(onClick = { paywallVisible = true }) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Lock,
+                                        contentDescription = "Watch ad — 60 min free",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                }
+                            }
+                            if (isPremium) {
+                                Icon(
+                                    imageVector = Icons.Default.WorkspacePremium,
+                                    contentDescription = "Premium active",
+                                    tint = Color(0xFFD4A017),
+                                    modifier = Modifier.size(22.dp)
+                                )
+                                Spacer(Modifier.width(4.dp))
+                            } else {
+                                TextButton(
+                                    onClick = { paywallVisible = true }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.WorkspacePremium,
+                                        contentDescription = stringResource(R.string.premium_unlock_btn),
+                                        tint = Color(0xFFD4A017),
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(Modifier.width(4.dp))
+                                    Text(
+                                        text = "Premium",
+                                        color = Color(0xFFD4A017),
+                                        fontWeight = FontWeight.Bold,
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
+                            }
+                            IconButton(
+                                onClick = {
+                                    navController.navigate(Screen.Settings.route) {
+                                        launchSingleTop = true
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = stringResource(R.string.tab_settings),
+                                    tint = Color.White
+                                )
+                            }
+                        },
                         colors = TopAppBarDefaults.topAppBarColors(
                             containerColor = Color.Transparent
                         )
@@ -133,13 +219,13 @@ fun AppNavigation() {
                 }
             },
             bottomBar = {
-                if (!isOnHistoryDetail) {
+                if (!isOnHistoryDetail && !isOnSettings) {
                     NavigationBar(tonalElevation = 8.dp) {
                         navItems.forEach { item ->
                             val selected = currentDestination?.hierarchy
                                 ?.any { it.route == item.screen.route } == true
                             NavigationBarItem(
-                                icon = { Icon(item.icon, contentDescription = null) },
+                                icon = { Icon(item.icon, contentDescription = stringResource(item.labelRes)) },
                                 label = {
                                     Text(
                                         text = stringResource(item.labelRes),
@@ -153,6 +239,7 @@ fun AppNavigation() {
                                     indicatorColor      = MaterialTheme.colorScheme.primaryContainer
                                 ),
                                 onClick = {
+                                    freemiumVm.logTabChanged(item.screen.route)
                                     navController.navigate(item.screen.route) {
                                         popUpTo(navController.graph.findStartDestination().id) {
                                             saveState = true
@@ -160,6 +247,7 @@ fun AppNavigation() {
                                         launchSingleTop = true
                                         restoreState    = true
                                     }
+                                    freemiumVm.recordAction()
                                 }
                             )
                         }
@@ -181,6 +269,9 @@ fun AppNavigation() {
                             navController.navigate(Screen.HistoryDetail.route(id))
                         }
                     )
+                }
+                composable(Screen.Settings.route) {
+                    SettingsScreen(languageManager = settingsVm.languageManager)
                 }
                 composable(
                     route     = Screen.HistoryDetail.route,

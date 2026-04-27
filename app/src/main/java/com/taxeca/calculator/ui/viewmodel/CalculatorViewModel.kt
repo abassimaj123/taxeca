@@ -176,9 +176,13 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
+    fun logShareResult(provinceCode: String, format: String) {
+        analytics.log("share_result", "province" to provinceCode, "format" to format)
+    }
+
     fun resetDisplay() {
-        _amountInput.value    = ""
-        _taxResult.value      = null
+        _amountInput.value       = ""
+        _taxResult.value         = null
         _tipEnabled.value        = false
         _tipPreset.value         = 0.15
         _customTipInput.value    = ""

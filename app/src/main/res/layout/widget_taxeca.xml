@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:padding="12dp">
+
+    <!-- Header row: title + province -->
+    <LinearLayout
+        android:id="@+id/widget_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="TaxeCA 🍁"
+            android:textColor="#C8102E"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_province"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Québec"
+            android:textColor="#555555"
+            android:textSize="12sp"
+            android:textStyle="italic" />
+    </LinearLayout>
+
+    <!-- Amount -->
+    <TextView
+        android:id="@+id/widget_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/widget_header"
+        android:layout_marginTop="2dp"
+        android:text="$100.00"
+        android:textColor="#222222"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <!-- Divider -->
+    <View
+        android:id="@+id/widget_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/widget_amount"
+        android:layout_marginTop="6dp"
+        android:background="#E0E0E0" />
+
+    <!-- Results block -->
+    <LinearLayout
+        android:id="@+id/widget_results"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/widget_divider"
+        android:layout_marginTop="6dp"
+        android:orientation="vertical">
+
+        <!-- Line 1: Tax label 1 (GST / HST) -->
+        <LinearLayout
+            android:id="@+id/widget_row1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/widget_tax1_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="GST (5%)"
+                android:textColor="#555555"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/widget_tax1_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$5.00"
+                android:textColor="#222222"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Line 2: Tax label 2 (PST/QST/RST or empty) -->
+        <LinearLayout
+            android:id="@+id/widget_row2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/widget_tax2_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="QST (9.975%)"
+                android:textColor="#555555"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/widget_tax2_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$9.98"
+                android:textColor="#222222"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Line 3: Total TTC -->
+        <LinearLayout
+            android:id="@+id/widget_row3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Total TTC"
+                android:textColor="#C8102E"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_total_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$114.98"
+                android:textColor="#C8102E"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Open button bottom-right -->
+    <TextView
+        android:id="@+id/widget_open_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/widget_button_bg"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="4dp"
+        android:text="Ouvrir"
+        android:textColor="#FFFFFF"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+</RelativeLayout>

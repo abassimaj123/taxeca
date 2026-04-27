@@ -69,7 +69,7 @@ enum class Province(
         nameFr = "Nouvelle-Écosse",
         gstRate = 0.0,
         pstRate = 0.0,
-        hstRate = 0.15,
+        hstRate = 0.17,  // raised from 15% to 17% effective April 1, 2025
         pstLabel = ""
     ),
     NU(

@@ -24,4 +24,10 @@ interface HistoryDao {
 
     @Query("SELECT * FROM calculations WHERE id = :id LIMIT 1")
     suspend fun getById(id: Long): HistoryEntity?
+
+    @Query("SELECT COUNT(*) FROM calculations")
+    suspend fun count(): Int
+
+    @Query("DELETE FROM calculations WHERE id = (SELECT id FROM calculations ORDER BY timestamp ASC LIMIT 1)")
+    suspend fun deleteOldest()
 }

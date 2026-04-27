@@ -10,31 +10,30 @@ class CalculateTaxUseCase @Inject constructor() {
     operator fun invoke(amount: Double, province: Province): TaxResult {
         return if (province.isHstProvince) {
             val hstAmount = amount * province.hstRate
-            val totalTax = hstAmount
             TaxResult(
-                province = province,
-                mode = CalculationMode.FORWARD,
+                province    = province,
+                mode        = CalculationMode.FORWARD,
                 inputAmount = amount,
-                baseAmount = amount,
-                gstAmount = 0.0,
-                pstAmount = 0.0,
-                hstAmount = hstAmount,
-                totalTax = totalTax,
-                totalAmount = amount + totalTax
+                baseAmount  = amount,
+                gstAmount   = 0.0,
+                pstAmount   = 0.0,
+                hstAmount   = hstAmount,
+                totalTax    = hstAmount,
+                totalAmount = amount + hstAmount
             )
         } else {
             val gstAmount = amount * province.gstRate
             val pstAmount = amount * province.pstRate
-            val totalTax = gstAmount + pstAmount
+            val totalTax  = gstAmount + pstAmount
             TaxResult(
-                province = province,
-                mode = CalculationMode.FORWARD,
+                province    = province,
+                mode        = CalculationMode.FORWARD,
                 inputAmount = amount,
-                baseAmount = amount,
-                gstAmount = gstAmount,
-                pstAmount = pstAmount,
-                hstAmount = 0.0,
-                totalTax = totalTax,
+                baseAmount  = amount,
+                gstAmount   = gstAmount,
+                pstAmount   = pstAmount,
+                hstAmount   = 0.0,
+                totalTax    = totalTax,
                 totalAmount = amount + totalTax
             )
         }

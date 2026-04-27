@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,7 +24,6 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,16 +40,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.taxeca.calculator.R
 import com.taxeca.calculator.data.model.HistoryEntity
-import com.taxeca.calculator.ui.components.GradientButton
 import com.taxeca.calculator.ui.components.PremiumBannerSection
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
 import com.taxeca.calculator.ui.theme.AccentGreen
@@ -65,11 +62,11 @@ fun HistoryScreen(
     onNavigateToDetail: (Long) -> Unit,
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
-    val history      by viewModel.history.collectAsStateWithLifecycle()
-    val freemiumVm   = LocalFreemiumViewModel.current
-    val hasAccess    by freemiumVm.hasAccess.collectAsStateWithLifecycle()
-    val isLoadingAd  by freemiumVm.isLoadingAd.collectAsStateWithLifecycle()
-    val context      = LocalContext.current
+    val history          by viewModel.history.collectAsStateWithLifecycle()
+    val freemiumVm       = LocalFreemiumViewModel.current
+    val isPremium        by freemiumVm.isPremium.collectAsStateWithLifecycle()
+    val isRewardedActive by freemiumVm.isRewardedActive.collectAsStateWithLifecycle()
+    val hasFullAccess    = isPremium || isRewardedActive
 
     // ── Confirmation dialogs state ────────────────────────────────────────────
     var pendingDeleteId      by remember { mutableStateOf<Long?>(null) }
@@ -137,7 +134,7 @@ fun HistoryScreen(
                 stringResource(R.string.tab_history),
                 style = MaterialTheme.typography.titleLarge
             )
-            if (history.isNotEmpty() && hasAccess) {
+            if (history.isNotEmpty()) {
                 IconButton(onClick = { showDeleteAllDialog = true }) {
                     Icon(
                         Icons.Default.DeleteSweep,
@@ -148,13 +145,41 @@ fun HistoryScreen(
             }
         }
 
-        if (!hasAccess) {
-            // ── Freemium gate ─────────────────────────────────────────────────
-            FreemiumGate(
-                isLoading = isLoadingAd,
-                onWatchAd = { freemiumVm.requestAccess(context) {} }
+        // Always-visible counter row
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 2.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = if (hasFullAccess)
+                    "${history.size} ${stringResource(R.string.history_entries_saved)}"
+                else
+                    "${history.size} / 5 ${stringResource(R.string.history_saved)}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-        } else if (history.isEmpty()) {
+            if (!hasFullAccess) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.history_free_limit_short),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        }
+
+        if (history.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -181,7 +206,8 @@ fun HistoryScreen(
             ) {
                 item { Spacer(Modifier.height(4.dp)) }
 
-                items(items = history, key = { it.id }) { entity ->
+                val displayedHistory = if (hasFullAccess) history else history.take(5)
+                items(items = displayedHistory, key = { it.id }) { entity ->
                     // Swipe triggers confirmation dialog (returns false = snap back)
                     val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = { value ->
@@ -206,7 +232,8 @@ fun HistoryScreen(
                                 contentAlignment = Alignment.CenterEnd
                             ) {
                                 Icon(
-                                    Icons.Default.Delete, null,
+                                    Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.btn_delete),
                                     tint = MaterialTheme.colorScheme.onErrorContainer
                                 )
                             }
@@ -214,8 +241,23 @@ fun HistoryScreen(
                         modifier = Modifier.animateItem()
                     ) {
                         HistoryCompactCard(
-                            entity = entity,
-                            onClick = { onNavigateToDetail(entity.id) }
+                            entity  = entity,
+                            onClick = { onNavigateToDetail(entity.id) },
+                            onDelete = { pendingDeleteId = entity.id }
+                        )
+                    }
+                }
+
+                // Upsell nudge: reveal that hidden entries are already saved
+                if (!hasFullAccess && history.size > 5) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.history_hidden_nudge, history.size),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 4.dp, vertical = 2.dp)
                         )
                     }
                 }
@@ -227,49 +269,15 @@ fun HistoryScreen(
     }
 }
 
-// ── Freemium gate ─────────────────────────────────────────────────────────────
-
-@Composable
-private fun FreemiumGate(isLoading: Boolean, onWatchAd: () -> Unit) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(horizontal = 32.dp)
-        ) {
-            Icon(
-                Icons.Default.Lock, null,
-                modifier = Modifier.size(56.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = stringResource(R.string.freemium_gate_title),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = stringResource(R.string.freemium_gate_message),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
-            if (isLoading) {
-                CircularProgressIndicator()
-            } else {
-                GradientButton(
-                    text    = stringResource(R.string.freemium_watch_ad),
-                    onClick = onWatchAd
-                )
-            }
-        }
-    }
-}
-
 // ── Compact card ──────────────────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HistoryCompactCard(entity: HistoryEntity, onClick: () -> Unit) {
+private fun HistoryCompactCard(
+    entity: HistoryEntity,
+    onClick: () -> Unit,
+    onDelete: () -> Unit
+) {
     val locale  = Locale.getDefault()
     val isFr    = locale.language == "fr"
     val dateStr = SimpleDateFormat("d MMM yyyy  HH:mm", locale).format(Date(entity.timestamp))
@@ -279,7 +287,6 @@ private fun HistoryCompactCard(entity: HistoryEntity, onClick: () -> Unit) {
         "RESTAURANT" -> "🍽️"
         else         -> "🧮"
     }
-    // Fix: FORWARD shows just "Calculatrice", REVERSE shows "Calculatrice (Inverse)"
     val calcLabel = stringResource(R.string.tab_calculator)
     val typeLabel = when (entity.mode) {
         "SHOPPING"   -> stringResource(R.string.history_mode_shopping)
@@ -301,7 +308,7 @@ private fun HistoryCompactCard(entity: HistoryEntity, onClick: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(start = 16.dp, end = 4.dp, top = 12.dp, bottom = 12.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Row(
@@ -309,34 +316,38 @@ private fun HistoryCompactCard(entity: HistoryEntity, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "$icon  $typeLabel",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    text = dateStr,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = if (isFr) "Total : ${CurrencyFormatter.formatAmount(entity.totalAmount)}"
-                           else "Total: ${CurrencyFormatter.formatAmount(entity.totalAmount)}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = AccentGreen
-                )
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "$icon  $typeLabel",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = dateStr,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = if (isFr) "Total : ${CurrencyFormatter.formatAmount(entity.totalAmount)}"
+                               else "Total: ${CurrencyFormatter.formatAmount(entity.totalAmount)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = AccentGreen
+                    )
+                    IconButton(
+                        onClick = onDelete,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.btn_delete),
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
             }
         }
     }

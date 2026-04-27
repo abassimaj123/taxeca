@@ -97,7 +97,7 @@ class AdManager @Inject constructor(
                 if (rewarded) onRewarded() else onDismissedWithoutReward()
             }
             override fun onAdFailedToShowFullScreenContent(error: AdError) {
-                onRewarded() // grant access on failure
+                onDismissedWithoutReward()
             }
         }
         ad.show(activity) { _ -> rewarded = true }

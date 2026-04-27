@@ -76,7 +76,7 @@
     <string name="history_detail_per_person">Par personne (÷%1$d)</string>
 
     <!-- Premium unlock button (always visible) -->
-    <string name="premium_unlock_btn">🔓 Débloquer 1h premium</string>
+    <string name="premium_unlock_btn">🔓 Débloquer l\'historique 1h (gratuit)</string>
 
     <!-- Freemium gate -->
     <string name="freemium_gate_title">Essai terminé</string>
@@ -114,6 +114,66 @@
     <string name="restaurant_no_split">Sans division</string>
     <string name="restaurant_split_custom_hint">Nombre de personnes</string>
     <string name="restaurant_per_person">Par personne (÷%1$d)</string>
+
+    <!-- IAP Premium -->
+    <string name="premium_buy_btn">⭐ Obtenir Premium — 1,99 $</string>
+    <string name="premium_restore_btn">Restaurer l\'achat</string>
+    <string name="premium_active_label">⭐ Premium — Accès illimité</string>
+    <string name="rewarded_countdown">🔓 Historique débloqué : %1$dm %2$ds restantes</string>
+    <string name="rewarded_daily_limit">Reviens demain pour une autre heure gratuite</string>
+    <string name="history_free_limit">Gratuit : 5 dernières entrées · Passez à Premium</string>
+    <string name="history_entries_saved">entrées enregistrées</string>
+    <string name="history_saved">enregistrés</string>
+    <string name="history_free_limit_short">5 max · Passer à Premium</string>
+    <string name="history_hidden_nudge">%1$d calculs enregistrés — passez à Premium pour les voir tous</string>
+
+    <!-- Tax tooltips -->
+    <string name="tooltip_gst_title">TPS — Taxe sur les produits et services</string>
+    <string name="tooltip_gst_body">Taxe fédérale de 5 % applicable à la plupart des biens et services dans toutes les provinces et territoires canadiens.</string>
+    <string name="tooltip_pst_title">TVP — Taxe de vente provinciale</string>
+    <string name="tooltip_pst_body">Taxe provinciale variant selon la province (6–7 %). Non applicable en Alberta, dans les Territoires du Nord-Ouest, au Nunavut et au Yukon.</string>
+    <string name="tooltip_qst_title">TVQ — Taxe de vente du Québec</string>
+    <string name="tooltip_qst_body">Taxe provinciale québécoise de 9,975 %, calculée sur le montant de base avant taxes (non composée sur la TPS).</string>
+    <string name="tooltip_rst_title">TDV — Taxe de vente au détail</string>
+    <string name="tooltip_rst_body">Taxe provinciale de vente au détail du Manitoba de 7 %, appliquée sur le montant de base avant TPS.</string>
+    <string name="tooltip_hst_title">TVH — Taxe de vente harmonisée</string>
+    <string name="tooltip_hst_body" formatted="false">Une taxe unique combinant la part fédérale de la TPS (5 %) et la part provinciale en un seul taux. Applicable au N.-B. (15 %), T.-N.-L. (15 %), N.-É. (17 %), Ont. (13 %) et Î.-P.-É. (15 %). La Nouvelle-Écosse a augmenté son taux à 17 % le 1er avril 2025.</string>
+    <string name="premium_gate_title">Historique verrouillé</string>
+    <string name="premium_gate_message">Regardez une pub pour 1 heure d\'accès, ou obtenez Premium pour un historique illimité.</string>
+
+    <!-- Unlock bottom sheet -->
+    <string name="unlock_btn_label">🔒 Déverrouiller l\'accès complet</string>
+    <string name="unlock_sheet_title">Déverrouiller l\'accès complet</string>
+    <string name="unlock_watch_subtitle">60 min d\'accès gratuit</string>
+    <string name="unlock_premium_subtitle">Sans pub · Historique illimité</string>
+    <string name="unlock_access_active">Accès actif · %1$dm restant</string>
+    <string name="unlock_ad_unavailable">Pub non disponible. Réessayez plus tard.</string>
+    <string name="unlock_sheet_benefits">Sans pub · Historique illimité</string>
+    <string name="unlock_maybe_later">Peut-être plus tard</string>
+
+    <!-- Settings -->
+    <string name="tab_settings">Paramètres</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_premium_subtitle">Sans pub · Historique illimité</string>
+    <string name="settings_support">Assistance</string>
+    <string name="settings_contact">Contacter le support</string>
+    <string name="settings_privacy">Politique de confidentialité</string>
+    <string name="settings_about">À propos</string>
+    <string name="settings_other_apps">Nos autres applications</string>
+    <string name="settings_disclaimer">À titre informatif seulement. Ce n\'est pas un conseil financier. Consultez un conseiller qualifié avant de prendre des décisions financières.</string>
+
+    <!-- Empty states -->
+    <string name="shopping_empty_hint">Ajoutez votre premier article ci-dessus</string>
+    <string name="restaurant_empty_hint">Ajoutez des articles pour commencer</string>
+
+    <!-- Premium benefits list -->
+    <string name="benefit_no_ads">Aucune publicité</string>
+    <string name="benefit_unlimited_history">Historique illimité</string>
+    <string name="benefit_all_provinces">Les 13 provinces et territoires</string>
+    <string name="benefit_share_export">Partage et export PDF des résultats</string>
+    <string name="iap_error_generic">Achat échoué. Veuillez réessayer.</string>
+    <string name="content_desc_locked">Verrouillé</string>
+    <string name="content_desc_unlocked">Déverrouillé</string>
 
     <!-- Province names (French) -->
     <string name="province_ab">Alberta</string>

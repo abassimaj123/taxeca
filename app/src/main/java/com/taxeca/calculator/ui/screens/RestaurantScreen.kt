@@ -97,9 +97,11 @@ fun RestaurantScreen(
     val hasResult    = result != null && isInputValid
     val itemPriceFocus = remember { FocusRequester() }
 
+    // Record a freemium action on every new valid restaurant result
     LaunchedEffect(result) {
-        if (result != null) freemiumVm.trackCalculation(ctx)
+        if (result != null) freemiumVm.recordAction()
     }
+
     val fmt: (Double) -> String = { CurrencyFormatter.formatAmount(it) }
 
     LazyColumn(
@@ -221,6 +223,24 @@ fun RestaurantScreen(
                             },
                             enabled  = isItemPriceValid,
                             modifier = Modifier.width(100.dp)
+                        )
+                    }
+                }
+            }
+
+            // Empty state hint
+            if (restaurantItems.isEmpty()) {
+                item {
+                    Box(
+                        modifier         = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text  = stringResource(R.string.restaurant_empty_hint),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                         )
                     }
                 }
@@ -403,7 +423,10 @@ fun RestaurantScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             OutlinedButton(
-                                onClick  = viewModel::saveToHistory,
+                                onClick  = {
+                                    viewModel.saveToHistory()
+                                    freemiumVm.trackCalculation(ctx)
+                                },
                                 enabled  = hasResult && !saveConfirmed,
                                 modifier = Modifier
                                     .weight(1f)
@@ -417,16 +440,16 @@ fun RestaurantScreen(
                             GradientButton(
                                 text    = stringResource(R.string.btn_share),
                                 onClick = {
-                                    freemiumVm.requestAccess(ctx) {
-                                        val text = buildRestaurantShareText(r)
-                                        val intent = Intent(Intent.ACTION_SEND).apply {
-                                            type = "text/plain"
-                                            putExtra(Intent.EXTRA_TEXT, text)
-                                        }
-                                        ctx.startActivity(Intent.createChooser(intent, null))
-                                        viewModel.saveToHistory()
-                                        viewModel.resetDisplay()
+                                    val text = buildRestaurantShareText(r)
+                                    val intent = Intent(Intent.ACTION_SEND).apply {
+                                        type = "text/plain"
+                                        putExtra(Intent.EXTRA_TEXT, text)
                                     }
+                                    ctx.startActivity(Intent.createChooser(intent, null))
+                                    viewModel.logShare()
+                                    freemiumVm.trackCalculation(ctx)
+                                    viewModel.saveToHistory()
+                                    viewModel.resetDisplay()
                                 },
                                 modifier = Modifier
                                     .weight(1f)
@@ -472,7 +495,8 @@ private fun RestaurantItemRow(
                     .padding(end = 20.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                Icon(Icons.Default.Delete, null,
+                Icon(Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.btn_delete),
                     tint = MaterialTheme.colorScheme.onErrorContainer,
                     modifier = Modifier.size(24.dp))
             }
@@ -510,7 +534,8 @@ private fun RestaurantItemRow(
                         .padding(start = 4.dp)
                 ) {
                     Icon(
-                        Icons.Default.Delete, null,
+                        Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.btn_delete),
                         tint     = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(18.dp)
                     )

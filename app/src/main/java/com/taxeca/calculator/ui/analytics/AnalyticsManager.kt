@@ -32,6 +32,8 @@ class AnalyticsManager @Inject constructor(
         fa.logEvent(event, bundle)
     }
 
+    fun setUserProperty(name: String, value: String) = fa.setUserProperty(name, value)
+
     fun setKey(key: String, value: String)  = crashlytics.setCustomKey(key, value)
     fun setKey(key: String, value: Boolean) = crashlytics.setCustomKey(key, value)
     fun setKey(key: String, value: Int)     = crashlytics.setCustomKey(key, value)

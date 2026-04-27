@@ -5,10 +5,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
-import com.taxeca.calculator.BuildConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,57 +16,73 @@ import javax.inject.Singleton
 class FreemiumRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
-    private val KEY_FIRST_LAUNCH      = longPreferencesKey("first_launch_date")
-    private val KEY_REWARDED_AT       = longPreferencesKey("rewarded_unlocked_at")
-    private val KEY_CALC_COUNT        = intPreferencesKey("calc_count")
-    private val KEY_LAST_INTERSTITIAL = longPreferencesKey("last_interstitial_at")
-
-    val firstLaunchDate: Flow<Long>    = dataStore.data.map { it[KEY_FIRST_LAUNCH]  ?: 0L }
-    val rewardedUnlockedAt: Flow<Long> = dataStore.data.map { it[KEY_REWARDED_AT]   ?: 0L }
-
-    suspend fun ensureFirstLaunch() {
-        dataStore.edit { prefs ->
-            if (prefs[KEY_FIRST_LAUNCH] == null) {
-                prefs[KEY_FIRST_LAUNCH] = System.currentTimeMillis()
-            }
-        }
+    companion object {
+        const val MAX_REWARDED_PER_DAY  = 2
+        private const val SESSION_MIN_GAP_MS = 2 * 60 * 1000L // 2 min — prevents force-close cycling
     }
 
-    suspend fun setRewardedUnlockedAt() {
-        dataStore.edit { it[KEY_REWARDED_AT] = System.currentTimeMillis() }
-    }
+    private val KEY_REWARDED_AT    = longPreferencesKey("rewarded_unlocked_at")
+    private val KEY_REWARDED_DAY   = intPreferencesKey("rewarded_day_of_year")
+    private val KEY_REWARDED_COUNT = intPreferencesKey("rewarded_count_today")
+    private val KEY_SESSION_COUNT  = intPreferencesKey("paywall_session_count")
+    private val KEY_LAST_SESSION_MS = longPreferencesKey("last_session_timestamp_ms")
 
-    suspend fun incrementCalcCount(): Int {
+    val sessionCount: Flow<Int> = dataStore.data.map { it[KEY_SESSION_COUNT] ?: 0 }
+
+    suspend fun incrementSession(): Int {
         var newCount = 0
         dataStore.edit { prefs ->
-            newCount = (prefs[KEY_CALC_COUNT] ?: 0) + 1
-            prefs[KEY_CALC_COUNT] = newCount
+            val lastMs = prefs[KEY_LAST_SESSION_MS] ?: 0L
+            val now    = System.currentTimeMillis()
+            if (now - lastMs < SESSION_MIN_GAP_MS) {
+                // Too soon after last session — don't count as a new session
+                newCount = prefs[KEY_SESSION_COUNT] ?: 0
+            } else {
+                newCount = (prefs[KEY_SESSION_COUNT] ?: 0) + 1
+                prefs[KEY_SESSION_COUNT]   = newCount
+                prefs[KEY_LAST_SESSION_MS] = now
+            }
         }
         return newCount
     }
 
-    suspend fun getLastInterstitialAt(): Long =
-        dataStore.data.first()[KEY_LAST_INTERSTITIAL] ?: 0L
+    val rewardedUnlockedAt: Flow<Long> = dataStore.data.map { it[KEY_REWARDED_AT] ?: 0L }
 
-    suspend fun setLastInterstitialAt() {
-        dataStore.edit { it[KEY_LAST_INTERSTITIAL] = System.currentTimeMillis() }
-    }
-
-    /**
-     * Trial duration:
-     *  - DEBUG  → 0 ms  (trial always expired — for testing the freemium gate)
-     *  - RELEASE → 7 days
-     */
-    private val trialDurationMs: Long =
-        if (BuildConfig.DEBUG) 0L else 7L * 24 * 60 * 60 * 1000
-
-    fun isTrialActive(firstLaunch: Long): Boolean {
-        if (firstLaunch == 0L) return true      // not yet recorded → assume still in trial
-        return System.currentTimeMillis() - firstLaunch < trialDurationMs
+    /** How many rewarded watches have been used today (resets at midnight). */
+    val rewardedCountToday: Flow<Int> = dataStore.data.map { prefs ->
+        val savedDay = prefs[KEY_REWARDED_DAY] ?: -1
+        if (savedDay == todayOfYear()) prefs[KEY_REWARDED_COUNT] ?: 0 else 0
     }
 
     fun isRewardedActive(rewardedAt: Long): Boolean {
         if (rewardedAt == 0L) return false
         return System.currentTimeMillis() - rewardedAt < 60L * 60 * 1000
     }
+
+    /** Returns true only if the user can watch a rewarded ad right now:
+     *  - current session must be EXPIRED (no extending while active)
+     *  - daily limit not yet reached
+     */
+    suspend fun canWatchRewarded(): Boolean {
+        val prefs    = dataStore.data.first()
+        val rewardedAt = prefs[KEY_REWARDED_AT] ?: 0L
+        if (isRewardedActive(rewardedAt)) return false   // already active — no extend
+
+        val savedDay = prefs[KEY_REWARDED_DAY] ?: -1
+        val count    = if (savedDay == todayOfYear()) prefs[KEY_REWARDED_COUNT] ?: 0 else 0
+        return count < MAX_REWARDED_PER_DAY
+    }
+
+    suspend fun recordRewardedWatch() {
+        val today = todayOfYear()
+        dataStore.edit { prefs ->
+            val savedDay = prefs[KEY_REWARDED_DAY] ?: -1
+            val count    = if (savedDay == today) prefs[KEY_REWARDED_COUNT] ?: 0 else 0
+            prefs[KEY_REWARDED_AT]    = System.currentTimeMillis()
+            prefs[KEY_REWARDED_DAY]   = today
+            prefs[KEY_REWARDED_COUNT] = count + 1
+        }
+    }
+
+    private fun todayOfYear(): Int = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
 }

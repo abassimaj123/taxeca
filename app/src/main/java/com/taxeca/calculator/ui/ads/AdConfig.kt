@@ -14,8 +14,8 @@ import com.taxeca.calculator.BuildConfig
 object AdConfig {
     private val isDebug = BuildConfig.DEBUG
 
-    /** Mettre à true quand les IDs AdMob de production sont configurés. */
-    const val ADS_ENABLED = false
+    /** true = ads actives. En debug, les annonces sont désactivées pour éviter le trafic de test. */
+    val ADS_ENABLED = !isDebug
 
     // ── App ID (also declared in build.gradle.kts as manifestPlaceholder) ─────
     val APP_ID = if (isDebug)

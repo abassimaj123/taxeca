@@ -106,6 +106,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.appcompat)
     implementation(libs.play.services.ads)
+    implementation(libs.billing)
+    implementation(libs.play.review)
 
     // Firebase
     implementation(platform(libs.firebase.bom))

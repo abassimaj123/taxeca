@@ -76,7 +76,7 @@
     <string name="history_detail_per_person">Per person (÷%1$d)</string>
 
     <!-- Premium unlock button (always visible) -->
-    <string name="premium_unlock_btn">🔓 Unlock 1h premium</string>
+    <string name="premium_unlock_btn">🔓 Unlock history for 1h (free)</string>
 
     <!-- Freemium gate -->
     <string name="freemium_gate_title">Trial ended</string>
@@ -114,6 +114,66 @@
     <string name="restaurant_no_split">No split</string>
     <string name="restaurant_split_custom_hint">Number of people</string>
     <string name="restaurant_per_person">Per person (÷%1$d)</string>
+
+    <!-- IAP Premium -->
+    <string name="premium_buy_btn">⭐ Get Premium — $1.99</string>
+    <string name="premium_restore_btn">Restore purchase</string>
+    <string name="premium_active_label">⭐ Premium — Unlimited access</string>
+    <string name="rewarded_countdown">🔓 History unlocked: %1$dm %2$ds remaining</string>
+    <string name="rewarded_daily_limit">Come back tomorrow for another free hour</string>
+    <string name="history_free_limit">Free: last 5 entries · Upgrade for unlimited</string>
+    <string name="history_entries_saved">entries saved</string>
+    <string name="history_saved">saved</string>
+    <string name="history_free_limit_short">5 max · Upgrade</string>
+    <string name="history_hidden_nudge">%1$d calculations saved — upgrade to see them all</string>
+
+    <!-- Tax tooltips -->
+    <string name="tooltip_gst_title">GST — Goods &amp; Services Tax</string>
+    <string name="tooltip_gst_body">Federal tax of 5% applied on most goods and services across all Canadian provinces and territories.</string>
+    <string name="tooltip_pst_title">PST — Provincial Sales Tax</string>
+    <string name="tooltip_pst_body">Provincial tax that varies by province (6–7%). Not applied in Alberta, Northwest Territories, Nunavut, or Yukon.</string>
+    <string name="tooltip_qst_title">QST — Quebec Sales Tax</string>
+    <string name="tooltip_qst_body">Quebec\'s provincial tax of 9.975%, calculated on the pre-tax base amount (not compounded on GST).</string>
+    <string name="tooltip_rst_title">RST — Retail Sales Tax</string>
+    <string name="tooltip_rst_body">Manitoba\'s provincial retail sales tax of 7%, applied on the base amount before GST.</string>
+    <string name="tooltip_hst_title">HST — Harmonized Sales Tax</string>
+    <string name="tooltip_hst_body" formatted="false">A single tax that combines the federal GST (5%) and the provincial portion into one rate. Applied in NB (15%), NL (15%), NS (17%), ON (13%), and PE (15%). Nova Scotia raised its rate to 17% effective April 1, 2025.</string>
+    <string name="premium_gate_title">History locked</string>
+    <string name="premium_gate_message">Watch an ad for 1 hour of access, or get Premium for unlimited history.</string>
+
+    <!-- Unlock bottom sheet -->
+    <string name="unlock_btn_label">🔒 Unlock Full Access</string>
+    <string name="unlock_sheet_title">Unlock Full Access</string>
+    <string name="unlock_watch_subtitle">60 min free access</string>
+    <string name="unlock_premium_subtitle">No ads · Unlimited history</string>
+    <string name="unlock_access_active">Access active · %1$dm remaining</string>
+    <string name="unlock_ad_unavailable">Ad not available. Try again later.</string>
+    <string name="unlock_sheet_benefits">No ads · Unlimited history</string>
+    <string name="unlock_maybe_later">Maybe later</string>
+
+    <!-- Settings -->
+    <string name="tab_settings">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_premium_subtitle">No ads · Unlimited history</string>
+    <string name="settings_support">Support</string>
+    <string name="settings_contact">Contact support</string>
+    <string name="settings_privacy">Privacy policy</string>
+    <string name="settings_about">About</string>
+    <string name="settings_other_apps">Our other apps</string>
+    <string name="settings_disclaimer">For informational purposes only. Not financial advice. Consult a qualified advisor before making financial decisions.</string>
+
+    <!-- Empty states -->
+    <string name="shopping_empty_hint">Add your first item above</string>
+    <string name="restaurant_empty_hint">Add items to get started</string>
+
+    <!-- Premium benefits list -->
+    <string name="benefit_no_ads">No ads, ever</string>
+    <string name="benefit_unlimited_history">Unlimited calculation history</string>
+    <string name="benefit_all_provinces">All 13 provinces &amp; territories</string>
+    <string name="benefit_share_export">Share &amp; export results (PDF)</string>
+    <string name="iap_error_generic">Purchase failed. Please try again.</string>
+    <string name="content_desc_locked">Locked</string>
+    <string name="content_desc_unlocked">Unlocked</string>
 
     <!-- Province names (English) -->
     <string name="province_ab">Alberta</string>

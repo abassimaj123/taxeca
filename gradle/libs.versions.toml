@@ -19,6 +19,8 @@ lifecycleViewmodelCompose = "2.8.7"
 appcompat = "1.7.0"
 playServicesAds = "23.3.0"
 firebaseBom = "33.7.0"
+billing = "7.1.1"
+review = "2.0.2"
 googleServices = "4.4.2"
 
 [libraries]
@@ -48,6 +50,8 @@ datastore-preferences = { group = "androidx.datastore", name = "datastore-prefer
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
+billing = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "billing" }
+play-review = { group = "com.google.android.play", name = "review-ktx", version.ref = "review" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }

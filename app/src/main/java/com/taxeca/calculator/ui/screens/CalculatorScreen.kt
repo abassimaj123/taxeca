@@ -84,8 +84,9 @@ fun CalculatorScreen(
 
     val hasResult = taxResult != null && isInputValid
 
+    // Record a freemium action on every new valid calculation result
     LaunchedEffect(taxResult) {
-        if (taxResult != null) freemiumVm.trackCalculation(context)
+        if (taxResult != null) freemiumVm.recordAction()
     }
 
     LazyColumn(
@@ -330,7 +331,11 @@ fun CalculatorScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedButton(
-                    onClick  = viewModel::saveToHistory,
+                    onClick  = {
+                        viewModel.saveToHistory()
+                        freemiumVm.trackCalculation(context)
+                        freemiumVm.maybeRequestReview(context as android.app.Activity)
+                    },
                     enabled  = hasResult && !saveConfirmed,
                     modifier = Modifier
                         .weight(1f)
@@ -344,23 +349,23 @@ fun CalculatorScreen(
                 GradientButton(
                     text     = stringResource(R.string.btn_share),
                     onClick  = {
-                        freemiumVm.requestAccess(context) {
-                            taxResult?.let { r ->
-                                val text = buildCalculatorShareText(
-                                    r, tipEnabled, tipAmount, grandTotal,
-                                    splitEnabled, splitCount, perPerson
+                        taxResult?.let { r ->
+                            val text = buildCalculatorShareText(
+                                r, tipEnabled, tipAmount, grandTotal,
+                                splitEnabled, splitCount, perPerson
+                            )
+                            context.startActivity(
+                                Intent.createChooser(
+                                    Intent(Intent.ACTION_SEND).apply {
+                                        type = "text/plain"
+                                        putExtra(Intent.EXTRA_TEXT, text)
+                                    }, null
                                 )
-                                context.startActivity(
-                                    Intent.createChooser(
-                                        Intent(Intent.ACTION_SEND).apply {
-                                            type = "text/plain"
-                                            putExtra(Intent.EXTRA_TEXT, text)
-                                        }, null
-                                    )
-                                )
-                                viewModel.saveToHistory()
-                                viewModel.resetDisplay()
-                            }
+                            )
+                            viewModel.logShareResult(r.province.code, "text")
+                            freemiumVm.trackCalculation(context)
+                            viewModel.saveToHistory()
+                            viewModel.resetDisplay()
                         }
                     },
                     enabled  = hasResult,

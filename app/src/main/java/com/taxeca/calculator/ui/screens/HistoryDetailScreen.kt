@@ -39,7 +39,6 @@ import com.taxeca.calculator.R
 import com.taxeca.calculator.data.model.HistoryEntity
 import com.taxeca.calculator.domain.model.Province
 import com.taxeca.calculator.ui.components.GradientButton
-import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
 import com.taxeca.calculator.ui.theme.AccentGreen
 import com.taxeca.calculator.ui.viewmodel.HistoryDetailViewModel
 import com.taxeca.calculator.utils.CurrencyFormatter
@@ -72,8 +71,6 @@ fun HistoryDetailScreen(
 ) {
     val entry      by viewModel.entry.collectAsStateWithLifecycle()
     val context    = LocalContext.current
-    val freemiumVm = LocalFreemiumViewModel.current
-
     val entity = entry
     if (entity == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -318,17 +315,15 @@ fun HistoryDetailScreen(
             ) {
                 OutlinedButton(
                     onClick = {
-                        freemiumVm.requestAccess(context) {
-                            val text = buildDetailShareText(entity, province, isFr, savedItems, fmt, pct)
-                            context.startActivity(
-                                Intent.createChooser(
-                                    Intent(Intent.ACTION_SEND).apply {
-                                        type = "text/plain"
-                                        putExtra(Intent.EXTRA_TEXT, text)
-                                    }, null
-                                )
+                        val text = buildDetailShareText(entity, province, isFr, savedItems, fmt, pct)
+                        context.startActivity(
+                            Intent.createChooser(
+                                Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, text)
+                                }, null
                             )
-                        }
+                        )
                     },
                     modifier = Modifier
                         .weight(1f)

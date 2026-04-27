@@ -85,12 +85,11 @@ fun ShoppingScreen(
     val showClearDialog by viewModel.showClearDialog.collectAsStateWithLifecycle()
     val saveConfirmed   by viewModel.saveConfirmed.collectAsStateWithLifecycle()
 
-    android.util.Log.d("Shopping", "Items count: ${items.size}")
-
     val hasResult = listResult != null
 
+    // Record a freemium action on every new valid shopping result
     LaunchedEffect(listResult) {
-        if (listResult != null) freemiumVm.trackCalculation(context)
+        if (listResult != null) freemiumVm.recordAction()
     }
 
     val priceFocus = remember { FocusRequester() }
@@ -188,6 +187,24 @@ fun ShoppingScreen(
             }
         }
 
+        // ── Empty state hint ──────────────────────────────────────────────────
+        if (items.isEmpty()) {
+            item {
+                Box(
+                    modifier          = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp),
+                    contentAlignment  = Alignment.Center,
+                ) {
+                    Text(
+                        text  = stringResource(R.string.shopping_empty_hint),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    )
+                }
+            }
+        }
+
         // ── Items list header ─────────────────────────────────────────────────
         if (items.isNotEmpty()) {
             item {
@@ -249,7 +266,10 @@ fun ShoppingScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
-                            onClick  = viewModel::saveToHistory,
+                            onClick  = {
+                                viewModel.saveToHistory()
+                                freemiumVm.trackCalculation(context)
+                            },
                             enabled  = hasResult && !saveConfirmed,
                             modifier = Modifier
                                 .weight(1f)
@@ -263,15 +283,15 @@ fun ShoppingScreen(
                         GradientButton(
                             text    = stringResource(R.string.btn_share),
                             onClick = {
-                                freemiumVm.requestAccess(context) {
-                                    val intent = Intent(Intent.ACTION_SEND).apply {
-                                        type = "text/plain"
-                                        putExtra(Intent.EXTRA_TEXT, buildShareText(result))
-                                    }
-                                    context.startActivity(Intent.createChooser(intent, null))
-                                    viewModel.saveToHistory()
-                                    viewModel.resetDisplay()
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, buildShareText(result))
                                 }
+                                context.startActivity(Intent.createChooser(intent, null))
+                                viewModel.logShare()
+                                freemiumVm.trackCalculation(context)
+                                viewModel.saveToHistory()
+                                viewModel.resetDisplay()
                             },
                             modifier = Modifier
                                 .weight(1f)
@@ -330,7 +350,7 @@ private fun DeleteBackground() {
     ) {
         Icon(
             imageVector        = Icons.Default.Delete,
-            contentDescription = null,
+            contentDescription = stringResource(R.string.btn_delete),
             tint               = MaterialTheme.colorScheme.onErrorContainer,
             modifier           = Modifier.size(24.dp)
         )

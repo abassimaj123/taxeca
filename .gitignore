@@ -13,3 +13,4 @@ google-services.json
 /keystore/
 proguard/
 test-results/
+.claude/

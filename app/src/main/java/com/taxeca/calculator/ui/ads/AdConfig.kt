@@ -14,30 +14,30 @@ import com.taxeca.calculator.BuildConfig
 object AdConfig {
     private val isDebug = BuildConfig.DEBUG
 
-    /** true = ads actives. En debug, les annonces sont désactivées pour éviter le trafic de test. */
+    /** true = ads actives. En debug, IDs test Google sont utilisés (pas de trafic réel). */
     val ADS_ENABLED = !isDebug
 
     // ── App ID (also declared in build.gradle.kts as manifestPlaceholder) ─────
     val APP_ID = if (isDebug)
         "ca-app-pub-3940256099942544~3347511713"   // Google test App ID
     else
-        "TODO_ADMOB_APP_ID_PRODUCTION"              // ← replace before release
+        BuildConfig.ADMOB_APP_ID                    // Injected via gradle buildConfigField
 
     // ── Banner ────────────────────────────────────────────────────────────────
     val BANNER_ID = if (isDebug)
         "ca-app-pub-3940256099942544/6300978111"
     else
-        "TODO_ADMOB_BANNER_ID_PRODUCTION"           // ← replace before release
+        BuildConfig.ADMOB_BANNER_ID                // Injected via gradle buildConfigField
 
     // ── Interstitiel ──────────────────────────────────────────────────────────
     val INTERSTITIAL_ID = if (isDebug)
         "ca-app-pub-3940256099942544/1033173712"
     else
-        "TODO_ADMOB_INTERSTITIAL_ID_PRODUCTION"     // ← replace before release
+        BuildConfig.ADMOB_INTERSTITIAL_ID          // Injected via gradle buildConfigField
 
     // ── Rewarded ──────────────────────────────────────────────────────────────
     val REWARDED_ID = if (isDebug)
         "ca-app-pub-3940256099942544/5224354917"
     else
-        "TODO_ADMOB_REWARDED_ID_PRODUCTION"         // ← replace before release
+        BuildConfig.ADMOB_REWARDED_ID              // Injected via gradle buildConfigField
 }

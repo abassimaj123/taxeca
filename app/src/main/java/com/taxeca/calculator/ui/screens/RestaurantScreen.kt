@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -65,6 +66,8 @@ import com.taxeca.calculator.ui.components.PillButton
 import com.taxeca.calculator.ui.components.ProvinceSelector
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
 import com.taxeca.calculator.ui.theme.AccentGreen
+import com.taxeca.calculator.ui.utils.getDefaultEnterTransition
+import com.taxeca.calculator.ui.utils.getDefaultExitTransition
 import com.taxeca.calculator.ui.viewmodel.RestaurantViewModel
 import com.taxeca.calculator.ui.viewmodel.TIP_CUSTOM
 import com.taxeca.calculator.ui.viewmodel.TIP_PRESETS
@@ -97,16 +100,18 @@ fun RestaurantScreen(
     val hasResult    = result != null && isInputValid
     val itemPriceFocus = remember { FocusRequester() }
 
-    // Record a freemium action on every new valid restaurant result
-    LaunchedEffect(result) {
-        if (result != null) freemiumVm.recordAction()
-    }
+    // recordAction() called on Save button and tab navigation (not on every auto-recalculate)
 
     val fmt: (Double) -> String = { CurrencyFormatter.formatAmount(it) }
 
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
     LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
+            .widthIn(max = 560.dp)
+            .fillMaxWidth()
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -139,7 +144,8 @@ fun RestaurantScreen(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ListAlt, null,
+                            Icons.AutoMirrored.Filled.ListAlt,
+                            contentDescription = stringResource(R.string.desc_list_alt_icon),
                             tint     = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(20.dp)
                         )
@@ -169,6 +175,11 @@ fun RestaurantScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine      = true,
                     isError         = amountInput.isNotBlank() && !isInputValid,
+                    supportingText = {
+                        if (amountInput.isNotBlank() && !isInputValid) {
+                            Text(stringResource(R.string.error_invalid_amount))
+                        }
+                    },
                     modifier        = Modifier.fillMaxWidth()
                 )
             }
@@ -199,6 +210,12 @@ fun RestaurantScreen(
                             prefix          = { Text("$") },
                             placeholder     = { Text("0.00") },
                             singleLine      = true,
+                            isError         = itemPriceInput.isNotBlank() && !isItemPriceValid,
+                            supportingText = {
+                                if (itemPriceInput.isNotBlank() && !isItemPriceValid) {
+                                    Text(stringResource(R.string.error_invalid_amount))
+                                }
+                            },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Decimal,
                                 imeAction    = ImeAction.Done
@@ -331,7 +348,9 @@ fun RestaurantScreen(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                AnimatedVisibility(visible = selectedTip == TIP_CUSTOM) {
+                AnimatedVisibility(visible = selectedTip == TIP_CUSTOM,
+                    enter = getDefaultEnterTransition(),
+                    exit  = getDefaultExitTransition()) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -393,7 +412,9 @@ fun RestaurantScreen(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                AnimatedVisibility(visible = customSplitInput.isNotEmpty() || (splitCount > 4)) {
+                AnimatedVisibility(visible = customSplitInput.isNotEmpty() || (splitCount > 4),
+                    enter = getDefaultEnterTransition(),
+                    exit  = getDefaultExitTransition()) {
                     OutlinedTextField(
                         value           = customSplitInput,
                         onValueChange   = viewModel::onCustomSplitChange,
@@ -411,8 +432,8 @@ fun RestaurantScreen(
         item {
             AnimatedVisibility(
                 visible = hasResult,
-                enter   = fadeIn() + expandVertically(),
-                exit    = fadeOut() + shrinkVertically()
+                enter   = getDefaultEnterTransition(),
+                exit    = getDefaultExitTransition()
             ) {
                 result?.let { r ->
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -426,6 +447,7 @@ fun RestaurantScreen(
                                 onClick  = {
                                     viewModel.saveToHistory()
                                     freemiumVm.trackCalculation(ctx)
+                                    freemiumVm.recordAction()
                                 },
                                 enabled  = hasResult && !saveConfirmed,
                                 modifier = Modifier
@@ -464,6 +486,7 @@ fun RestaurantScreen(
         item { PremiumBannerSection(modifier = Modifier.fillMaxWidth()) }
         item { Spacer(Modifier.height(16.dp)) }
     }
+    } // end Box
 }
 
 // ── Restaurant item row (swipe to delete) ────────────────────────────────────

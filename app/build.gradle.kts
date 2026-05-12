@@ -23,12 +23,18 @@ android {
         applicationId = "com.taxeca.calculator"
         minSdk = 24
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.0.2"
+        versionCode = 4
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "APP_NAME", "\"TaxeCA\"")
+
+        // AdMob configuration (read from local.properties for release)
+        buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
+        buildConfigField("String", "ADMOB_BANNER_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
+        buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
+        buildConfigField("String", "ADMOB_REWARDED_ID", "\"ca-app-pub-3940256099942544/5224354917\"")
     }
 
     signingConfigs {
@@ -49,7 +55,15 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
-            manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713" // TODO: replace with real AdMob App ID before publishing
+
+            // AdMob configuration for release (inject from local.properties)
+            val admobAppId = localProps.getProperty("admob.app.id") ?: "ca-app-pub-3940256099942544~3347511713"
+            buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppId\"")
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"${localProps.getProperty("admob.banner.id") ?: "ca-app-pub-3940256099942544/6300978111"}\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"${localProps.getProperty("admob.interstitial.id") ?: "ca-app-pub-3940256099942544/1033173712"}\"")
+            buildConfigField("String", "ADMOB_REWARDED_ID", "\"${localProps.getProperty("admob.rewarded.id") ?: "ca-app-pub-3940256099942544/5224354917"}\"")
+
+            manifestPlaceholders["admobAppId"] = admobAppId
             ndk {
                 debugSymbolLevel = "FULL"
             }

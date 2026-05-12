@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -66,6 +67,8 @@ import com.taxeca.calculator.ui.components.GradientButton
 import com.taxeca.calculator.ui.components.ProvinceSelector
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
 import com.taxeca.calculator.ui.theme.AccentGreen
+import com.taxeca.calculator.ui.utils.getDefaultEnterTransition
+import com.taxeca.calculator.ui.utils.getDefaultExitTransition
 import com.taxeca.calculator.ui.viewmodel.ShoppingViewModel
 import com.taxeca.calculator.utils.CurrencyFormatter
 import androidx.compose.material3.OutlinedButton
@@ -87,10 +90,7 @@ fun ShoppingScreen(
 
     val hasResult = listResult != null
 
-    // Record a freemium action on every new valid shopping result
-    LaunchedEffect(listResult) {
-        if (listResult != null) freemiumVm.recordAction()
-    }
+    // recordAction() called on Save button and tab navigation (not on every auto-recalculate)
 
     val priceFocus = remember { FocusRequester() }
 
@@ -117,9 +117,14 @@ fun ShoppingScreen(
         )
     }
 
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
     LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
+            .widthIn(max = 560.dp)
+            .fillMaxWidth()
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
@@ -158,6 +163,12 @@ fun ShoppingScreen(
                         prefix        = { Text("$") },
                         placeholder   = { Text("0.00") },
                         singleLine    = true,
+                        isError       = priceInput.isNotBlank() && !isPriceValid,
+                        supportingText = {
+                            if (priceInput.isNotBlank() && !isPriceValid) {
+                                Text(stringResource(R.string.error_invalid_amount))
+                            }
+                        },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Decimal,
                             imeAction    = ImeAction.Done
@@ -246,8 +257,8 @@ fun ShoppingScreen(
         item {
             AnimatedVisibility(
                 visible = listResult != null,
-                enter   = fadeIn() + expandVertically(),
-                exit    = fadeOut() + shrinkVertically()
+                enter   = getDefaultEnterTransition(),
+                exit    = getDefaultExitTransition()
             ) {
                 listResult?.let { ShoppingSummaryCard(it) }
             }
@@ -257,8 +268,8 @@ fun ShoppingScreen(
         item {
             AnimatedVisibility(
                 visible = hasResult,
-                enter   = fadeIn() + expandVertically(),
-                exit    = fadeOut() + shrinkVertically()
+                enter   = getDefaultEnterTransition(),
+                exit    = getDefaultExitTransition()
             ) {
                 listResult?.let { result ->
                     Row(
@@ -269,6 +280,7 @@ fun ShoppingScreen(
                             onClick  = {
                                 viewModel.saveToHistory()
                                 freemiumVm.trackCalculation(context)
+                                freemiumVm.recordAction()
                             },
                             enabled  = hasResult && !saveConfirmed,
                             modifier = Modifier
@@ -305,6 +317,7 @@ fun ShoppingScreen(
         item { PremiumBannerSection(modifier = Modifier.fillMaxWidth()) }
         item { Spacer(Modifier.height(16.dp)) }
     }
+    } // end Box
 }
 
 // ── Swipe-to-delete item row ──────────────────────────────────────────────────

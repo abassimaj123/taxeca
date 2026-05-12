@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -179,7 +180,26 @@ fun UnlockBottomSheet(onDismiss: () -> Unit) {
                 Spacer(Modifier.height(16.dp))
             }
 
-            // ── Watch Ad tile ─────────────────────────────────────────────
+            // ── Get Premium tile (PRIMARY CTA) ────────────────────────────
+            _UnlockTile(
+                icon     = Icons.Default.StarOutline,
+                title    = premiumPrice
+                    ?.let { stringResource(R.string.premium_buy_with_price, it) }
+                    ?: stringResource(R.string.premium_buy_btn),
+                subtitle = stringResource(R.string.unlock_premium_subtitle),
+                enabled  = !isLoading,
+                onClick  = { activity?.let { freemiumVm.buyPremium(it) } },
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text      = stringResource(R.string.unlock_one_time_payment),
+                fontSize  = 11.sp,
+                color     = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(10.dp))
+
+            // ── Watch Ad tile (SECONDARY) ─────────────────────────────────
             if (!isRewarded) {
                 _UnlockTile(
                     icon     = Icons.Default.PlayCircleOutline,
@@ -189,19 +209,7 @@ fun UnlockBottomSheet(onDismiss: () -> Unit) {
                     loading  = isLoading,
                     onClick  = { freemiumVm.watchRewardedForBonus(context) },
                 )
-                Spacer(Modifier.height(10.dp))
             }
-
-            // ── Get Premium tile ──────────────────────────────────────────
-            _UnlockTile(
-                icon     = Icons.Default.StarOutline,
-                title    = premiumPrice
-                    ?.let { "⭐ Get Premium — $it" }
-                    ?: stringResource(R.string.premium_buy_btn),
-                subtitle = stringResource(R.string.unlock_premium_subtitle),
-                enabled  = !isLoading,
-                onClick  = { activity?.let { freemiumVm.buyPremium(it) } },
-            )
 
             // ── Restore ───────────────────────────────────────────────────
             TextButton(onClick = { activity?.let { freemiumVm.restorePurchases(it) } }) {
@@ -212,10 +220,10 @@ fun UnlockBottomSheet(onDismiss: () -> Unit) {
                 )
             }
 
-            // ── Maybe later — 50% opacity for hard paywall (sessions 7+) ────
+            // ── Maybe later ───────────────────────────────────────────────
             TextButton(
                 onClick  = onDismiss,
-                modifier = Modifier.alpha(if (isHardPaywall) 0.5f else 1f)
+                modifier = Modifier.alpha(1f)
             ) {
                 Text(
                     text  = stringResource(R.string.unlock_maybe_later),

@@ -16,10 +16,10 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
-    primary = Blue40,
+    primary = CanadaRed,
     onPrimary = Grey99,
-    primaryContainer = Blue90,
-    onPrimaryContainer = Blue10,
+    primaryContainer = CanadaRed90,
+    onPrimaryContainer = CanadaRed10,
     secondary = Teal40,
     onSecondary = Grey99,
     secondaryContainer = Teal90,
@@ -38,10 +38,10 @@ private val LightColorScheme = lightColorScheme(
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Blue80,
-    onPrimary = Blue20,
-    primaryContainer = Blue30,
-    onPrimaryContainer = Blue90,
+    primary = CanadaRed80,
+    onPrimary = CanadaRed20,
+    primaryContainer = CanadaRed30,
+    onPrimaryContainer = CanadaRed90,
     secondary = Teal80,
     onSecondary = Teal20,
     secondaryContainer = Teal30,
@@ -52,7 +52,7 @@ private val DarkColorScheme = darkColorScheme(
     onErrorContainer = Red90,
     background = Grey10,
     onBackground = Grey90,
-    surface = Grey10,
+    surface = Grey20,   // Changed from Grey10 to elevate from background
     onSurface = Grey90,
     surfaceVariant = BlueGrey30,
     onSurfaceVariant = BlueGrey80,
@@ -79,7 +79,7 @@ fun TaxeCATheme(
         SideEffect {
             val window = (view.context as Activity).window
             @Suppress("DEPRECATION")
-            window.statusBarColor = GradientStart.toArgb()
+            window.statusBarColor = CanadaRed.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }

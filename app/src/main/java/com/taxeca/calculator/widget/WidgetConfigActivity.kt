@@ -60,7 +60,7 @@ class WidgetConfigActivity : AppCompatActivity() {
         val tvTitle = TextView(this).apply {
             text = "TaxeCA — Widget"
             textSize = 20f
-            setTextColor(0xFFC8102E.toInt())
+            setTextColor(0xFFC62828.toInt())
             setTypeface(typeface, android.graphics.Typeface.BOLD)
             gravity = Gravity.CENTER
         }
@@ -123,7 +123,7 @@ class WidgetConfigActivity : AppCompatActivity() {
             text = "Appliquer / Apply"
             textSize = 15f
             setTextColor(0xFFFFFFFF.toInt())
-            setBackgroundColor(0xFFC8102E.toInt())
+            setBackgroundColor(0xFFC62828.toInt())
             isAllCaps = false
         }
         btnApply.setOnClickListener { applyWidget(provinces) }

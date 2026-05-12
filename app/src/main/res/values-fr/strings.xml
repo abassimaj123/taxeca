@@ -54,6 +54,12 @@
     <string name="history_mode_forward">Avant</string>
     <string name="history_mode_reverse">Inverse</string>
 
+    <!-- Error messages -->
+    <string name="error_invalid_amount">Veuillez entrer un montant valide</string>
+
+    <!-- Save feedback -->
+    <string name="save_success_message">Calcul enregistré dans l\'historique</string>
+
     <!-- History -->
     <string name="history_empty">Aucun calcul enregistré pour l\'instant.</string>
     <string name="history_deleted">Entrée supprimée.</string>
@@ -150,17 +156,26 @@
     <string name="unlock_ad_unavailable">Pub non disponible. Réessayez plus tard.</string>
     <string name="unlock_sheet_benefits">Sans pub · Historique illimité</string>
     <string name="unlock_maybe_later">Peut-être plus tard</string>
+    <string name="unlock_one_time_payment">Paiement unique · sans abonnement</string>
+    <string name="premium_buy_with_price">⭐ Obtenir Premium — %1$s</string>
+    <string name="content_desc_watch_ad_free">Voir une pub — 60 min gratuit</string>
 
     <!-- Settings -->
     <string name="tab_settings">Paramètres</string>
     <string name="settings_language">Langue</string>
+    <string name="settings_premium_section">Premium</string>
     <string name="settings_premium_subtitle">Sans pub · Historique illimité</string>
     <string name="settings_support">Assistance</string>
     <string name="settings_contact">Contacter le support</string>
     <string name="settings_privacy">Politique de confidentialité</string>
     <string name="settings_about">À propos</string>
     <string name="settings_other_apps">Nos autres applications</string>
+    <string name="settings_website_display">calqwise.com</string>
     <string name="settings_disclaimer">À titre informatif seulement. Ce n\'est pas un conseil financier. Consultez un conseiller qualifié avant de prendre des décisions financières.</string>
+    <string name="support_email_subject">Support TaxeCA</string>
+    <string name="url_support_email">mailto:support@calqwise.com</string>
+    <string name="url_privacy_policy">https://calqwise.com/privacy</string>
+    <string name="url_website">https://calqwise.com</string>
 
     <!-- Empty states -->
     <string name="shopping_empty_hint">Ajoutez votre premier article ci-dessus</string>
@@ -174,6 +189,28 @@
     <string name="iap_error_generic">Achat échoué. Veuillez réessayer.</string>
     <string name="content_desc_locked">Verrouillé</string>
     <string name="content_desc_unlocked">Déverrouillé</string>
+
+    <!-- History card total -->
+    <string name="history_card_total">Total : %1$s</string>
+
+    <!-- Icon accessibility descriptions -->
+    <string name="desc_delete_icon">Supprimer</string>
+    <string name="desc_delete_sweep_icon">Tout supprimer</string>
+    <string name="desc_lock_icon">Verrouillé</string>
+    <string name="desc_history_icon">Historique</string>
+    <string name="desc_language_icon">Changer de langue</string>
+    <string name="desc_verified_icon">Premium vérifié</string>
+    <string name="desc_email_icon">Envoyer un courriel</string>
+    <string name="desc_privacy_icon">Politique de confidentialité</string>
+    <string name="desc_apps_icon">Nos autres applications</string>
+    <string name="desc_restore_icon">Restaurer les achats</string>
+    <string name="desc_star_icon">Obtenir Premium</string>
+    <string name="desc_next_icon">Suivant</string>
+    <string name="desc_back_icon">Retour</string>
+    <string name="desc_list_alt_icon">Mode liste d\'articles</string>
+    <string name="desc_arrow_right_icon">Naviguer</string>
+    <string name="desc_tip_icon">Options de pourboire</string>
+    <string name="desc_split_icon">Partager l\'addition</string>
 
     <!-- Province names (French) -->
     <string name="province_ab">Alberta</string>

@@ -195,6 +195,7 @@ class FreemiumViewModel @Inject constructor(
             },
             onFailed = {
                 // Ad not available — do NOT grant free access; show error to user
+                analytics.logRewardedAdFailed()
                 _isLoadingAd.value = false
                 _adUnavailable.value = true
                 Log.d("FreemiumVM", "Rewarded ad unavailable — access denied")
@@ -227,6 +228,7 @@ class FreemiumViewModel @Inject constructor(
                 )
             },
             onFailed = {
+                analytics.logRewardedAdFailed()
                 _isLoadingAd.value = false
                 _adUnavailable.value = true
             }

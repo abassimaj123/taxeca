@@ -41,12 +41,20 @@
     <!-- Hints -->
     <string name="hint_enter_amount">Enter amount</string>
 
+    <!-- Error messages -->
+    <string name="error_invalid_amount">Please enter a valid amount</string>
+
+    <!-- Accessibility descriptions for icons -->
+    <string name="desc_tip_icon">Tip calculation options</string>
+    <string name="desc_split_icon">Split bill options</string>
+
     <!-- Split -->
     <string name="calculator_split_toggle">Split bill</string>
     <string name="calculator_per_person">Per person (÷%1$d)</string>
 
     <!-- Save feedback -->
     <string name="btn_saved">✓ Saved</string>
+    <string name="save_success_message">Calculation saved to history</string>
 
     <!-- History modes -->
     <string name="history_mode_shopping">Shopping</string>
@@ -150,17 +158,26 @@
     <string name="unlock_ad_unavailable">Ad not available. Try again later.</string>
     <string name="unlock_sheet_benefits">No ads · Unlimited history</string>
     <string name="unlock_maybe_later">Maybe later</string>
+    <string name="unlock_one_time_payment">One-time payment · no subscription</string>
+    <string name="premium_buy_with_price">⭐ Get Premium — %1$s</string>
+    <string name="content_desc_watch_ad_free">Watch ad — 60 min free</string>
 
     <!-- Settings -->
     <string name="tab_settings">Settings</string>
     <string name="settings_language">Language</string>
+    <string name="settings_premium_section">Premium</string>
     <string name="settings_premium_subtitle">No ads · Unlimited history</string>
     <string name="settings_support">Support</string>
     <string name="settings_contact">Contact support</string>
     <string name="settings_privacy">Privacy policy</string>
     <string name="settings_about">About</string>
     <string name="settings_other_apps">Our other apps</string>
+    <string name="settings_website_display">calqwise.com</string>
     <string name="settings_disclaimer">For informational purposes only. Not financial advice. Consult a qualified advisor before making financial decisions.</string>
+    <string name="support_email_subject">TaxeCA Support</string>
+    <string name="url_support_email">mailto:support@calqwise.com</string>
+    <string name="url_privacy_policy">https://calqwise.com/privacy</string>
+    <string name="url_website">https://calqwise.com</string>
 
     <!-- Empty states -->
     <string name="shopping_empty_hint">Add your first item above</string>
@@ -174,6 +191,26 @@
     <string name="iap_error_generic">Purchase failed. Please try again.</string>
     <string name="content_desc_locked">Locked</string>
     <string name="content_desc_unlocked">Unlocked</string>
+
+    <!-- History card total -->
+    <string name="history_card_total">Total: %1$s</string>
+
+    <!-- Icon accessibility descriptions -->
+    <string name="desc_delete_icon">Delete</string>
+    <string name="desc_delete_sweep_icon">Delete all</string>
+    <string name="desc_lock_icon">Locked</string>
+    <string name="desc_history_icon">History</string>
+    <string name="desc_language_icon">Change language</string>
+    <string name="desc_verified_icon">Verified premium</string>
+    <string name="desc_email_icon">Send email</string>
+    <string name="desc_privacy_icon">Privacy policy</string>
+    <string name="desc_apps_icon">Our other apps</string>
+    <string name="desc_restore_icon">Restore purchases</string>
+    <string name="desc_star_icon">Get premium</string>
+    <string name="desc_next_icon">Next</string>
+    <string name="desc_back_icon">Go back</string>
+    <string name="desc_list_alt_icon">Item list mode</string>
+    <string name="desc_arrow_right_icon">Navigate</string>
 
     <!-- Province names (English) -->
     <string name="province_ab">Alberta</string>

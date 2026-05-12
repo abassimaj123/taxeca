@@ -3,13 +3,17 @@ package com.taxeca.calculator.ui.screens
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -52,8 +56,14 @@ fun SettingsScreen(languageManager: LanguageManager) {
     val context    = LocalContext.current
     val activity   = context as? Activity
 
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
     Column(
         modifier = Modifier
+            .widthIn(max = 560.dp)
+            .fillMaxWidth()
             .verticalScroll(rememberScrollState())
             .padding(bottom = 32.dp)
     ) {
@@ -79,7 +89,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
                                      else MaterialTheme.colorScheme.onSurface
                 )
             ) {
-                Icon(Icons.Outlined.Language, null, modifier = Modifier.padding(end = 6.dp))
+                Icon(Icons.Outlined.Language, contentDescription = stringResource(R.string.desc_language_icon), modifier = Modifier.padding(end = 6.dp))
                 Text("Français", fontWeight = FontWeight.Medium)
             }
             Spacer(Modifier.width(12.dp))
@@ -96,7 +106,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
                                      else MaterialTheme.colorScheme.onSurface
                 )
             ) {
-                Icon(Icons.Outlined.Language, null, modifier = Modifier.padding(end = 6.dp))
+                Icon(Icons.Outlined.Language, contentDescription = stringResource(R.string.desc_language_icon), modifier = Modifier.padding(end = 6.dp))
                 Text("English", fontWeight = FontWeight.Medium)
             }
         }
@@ -104,11 +114,12 @@ fun SettingsScreen(languageManager: LanguageManager) {
         HorizontalDivider()
 
         // ── Premium ───────────────────────────────────────────────────────────
-        _SectionHeader("Premium")
+        _SectionHeader(stringResource(R.string.settings_premium_section))
         if (isPremium) {
             ListItem(
                 leadingContent = {
-                    Icon(Icons.Outlined.Verified, null,
+                    Icon(Icons.Outlined.Verified,
+                        contentDescription = stringResource(R.string.desc_verified_icon),
                         tint = MaterialTheme.colorScheme.primary)
                 },
                 headlineContent = {
@@ -141,8 +152,8 @@ fun SettingsScreen(languageManager: LanguageManager) {
             label   = stringResource(R.string.settings_contact),
             onClick = {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {
-                    data = Uri.parse("mailto:support@calqwise.com")
-                    putExtra(Intent.EXTRA_SUBJECT, "TaxeCA Support")
+                    data = Uri.parse(context.getString(R.string.url_support_email))
+                    putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.support_email_subject))
                 }
                 context.startActivity(intent)
             }
@@ -152,7 +163,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
             label   = stringResource(R.string.settings_privacy),
             onClick = {
                 context.startActivity(
-                    Intent(Intent.ACTION_VIEW, Uri.parse("https://calqwise.com/privacy"))
+                    Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.url_privacy_policy)))
                 )
             }
         )
@@ -163,10 +174,10 @@ fun SettingsScreen(languageManager: LanguageManager) {
         _SettingsTile(
             icon     = Icons.Outlined.Apps,
             label    = stringResource(R.string.settings_other_apps),
-            subtitle = "calqwise.com",
+            subtitle = stringResource(R.string.settings_website_display),
             onClick  = {
                 context.startActivity(
-                    Intent(Intent.ACTION_VIEW, Uri.parse("https://calqwise.com"))
+                    Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.url_website)))
                 )
             }
         )
@@ -187,6 +198,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
             modifier  = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
     }
+    } // end Box
 }
 
 // ── Reusable components ───────────────────────────────────────────────────────
@@ -209,13 +221,22 @@ private fun _SettingsTile(
     subtitle: String? = null,
     onClick: () -> Unit
 ) {
+    val iconDesc = when (icon) {
+        Icons.Outlined.Email -> stringResource(R.string.desc_email_icon)
+        Icons.Outlined.PrivacyTip -> stringResource(R.string.desc_privacy_icon)
+        Icons.Outlined.Apps -> stringResource(R.string.desc_apps_icon)
+        Icons.Outlined.Restore -> stringResource(R.string.desc_restore_icon)
+        Icons.Outlined.Star -> stringResource(R.string.desc_star_icon)
+        else -> label
+    }
     Surface(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         ListItem(
-            leadingContent  = { Icon(icon, null, tint = MaterialTheme.colorScheme.primary) },
+            leadingContent  = { Icon(icon, contentDescription = iconDesc, tint = MaterialTheme.colorScheme.primary) },
             headlineContent = { Text(label) },
             supportingContent = subtitle?.let { { Text(it) } },
             trailingContent = {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null,
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = stringResource(R.string.desc_arrow_right_icon),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         )

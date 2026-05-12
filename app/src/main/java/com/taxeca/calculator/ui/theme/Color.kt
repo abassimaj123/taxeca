@@ -2,13 +2,15 @@ package com.taxeca.calculator.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Primary blue family
-val Blue10 = Color(0xFF001945)
-val Blue20 = Color(0xFF002E78)
-val Blue30 = Color(0xFF0042A8)
-val Blue40 = Color(0xFF1565C0)
-val Blue80 = Color(0xFFAEC6FF)
-val Blue90 = Color(0xFFD8E2FF)
+// Primary Canada Red family
+val CanadaRed     = Color(0xFFC62828)
+val CanadaRedDark = Color(0xFFB71C1C)
+val CanadaRedDeep = Color(0xFF8E0000)
+val CanadaRed10   = Color(0xFF4E0000)
+val CanadaRed20   = Color(0xFF7F0000)
+val CanadaRed30   = Color(0xFFB71C1C)
+val CanadaRed80   = Color(0xFFEF9A9A)
+val CanadaRed90   = Color(0xFFFFCDD2)
 
 // Secondary teal family
 val Teal10 = Color(0xFF001F25)
@@ -44,6 +46,9 @@ val AccentGreen  = Color(0xFF2ECC71)
 val AccentGreenDark = Color(0xFF27AE60)
 
 // Gradient colours
-val GradientStart = Color(0xFF0D47A1)
-val GradientMid   = Color(0xFF1565C0)
-val GradientEnd   = Color(0xFF1976D2)
+val GradientStart = Color(0xFF8E0000)
+val GradientMid   = Color(0xFFC62828)
+val GradientEnd   = Color(0xFFE53935)
+
+// Premium badge
+val PremiumGold = Color(0xFFD4A017)

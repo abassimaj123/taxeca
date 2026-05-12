@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -29,10 +31,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -55,6 +61,8 @@ import com.taxeca.calculator.ui.theme.AccentGreen
 import com.taxeca.calculator.ui.viewmodel.CalculatorViewModel
 import com.taxeca.calculator.ui.viewmodel.TIP_CUSTOM
 import com.taxeca.calculator.ui.viewmodel.TIP_PRESETS
+import com.taxeca.calculator.ui.utils.getDefaultEnterTransition
+import com.taxeca.calculator.ui.utils.getDefaultExitTransition
 import com.taxeca.calculator.utils.CurrencyFormatter
 
 private val SPLIT_PRESETS = listOf(2, 3, 4, 5)
@@ -83,15 +91,22 @@ fun CalculatorScreen(
     val saveConfirmed    by viewModel.saveConfirmed.collectAsStateWithLifecycle()
 
     val hasResult = taxResult != null && isInputValid
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    // Record a freemium action on every new valid calculation result
-    LaunchedEffect(taxResult) {
-        if (taxResult != null) freemiumVm.recordAction()
+    // Show snackbar when calculation is saved
+    LaunchedEffect(saveConfirmed) {
+        if (saveConfirmed) {
+            snackbarHostState.showSnackbar(context.getString(R.string.save_success_message))
+        }
     }
 
-    LazyColumn(
+    // recordAction() called on Save button and tab navigation (not on every auto-recalculate)
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
+            .widthIn(max = 560.dp)
+            .fillMaxWidth()
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -122,6 +137,11 @@ fun CalculatorScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine    = true,
                 isError       = amountInput.isNotBlank() && !isInputValid,
+                supportingText = {
+                    if (amountInput.isNotBlank() && !isInputValid) {
+                        Text(stringResource(R.string.error_invalid_amount))
+                    }
+                },
                 modifier      = Modifier.fillMaxWidth()
             )
         }
@@ -150,7 +170,8 @@ fun CalculatorScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Savings, null,
+                            Icon(Icons.Default.Savings,
+                                contentDescription = stringResource(R.string.desc_tip_icon),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(20.dp))
                             Spacer(Modifier.width(8.dp))
@@ -162,8 +183,8 @@ fun CalculatorScreen(
                     }
 
                     AnimatedVisibility(visible = tipEnabled,
-                        enter = fadeIn() + expandVertically(),
-                        exit  = fadeOut() + shrinkVertically()) {
+                        enter = getDefaultEnterTransition(),
+                        exit  = getDefaultExitTransition()) {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Row(modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -182,7 +203,9 @@ fun CalculatorScreen(
                                     modifier = Modifier.weight(1f)
                                 )
                             }
-                            AnimatedVisibility(visible = tipPreset == TIP_CUSTOM) {
+                            AnimatedVisibility(visible = tipPreset == TIP_CUSTOM,
+                                enter = getDefaultEnterTransition(),
+                                exit  = getDefaultExitTransition()) {
                                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Row(modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -216,8 +239,8 @@ fun CalculatorScreen(
 
                     // Tip + grand total summary
                     AnimatedVisibility(visible = tipEnabled && hasResult,
-                        enter = fadeIn() + expandVertically(),
-                        exit  = fadeOut() + shrinkVertically()) {
+                        enter = getDefaultEnterTransition(),
+                        exit  = getDefaultExitTransition()) {
                         taxResult?.let { result ->
                             TipSummary(result = result, tipAmount = tipAmount, grandTotal = grandTotal)
                         }
@@ -247,7 +270,8 @@ fun CalculatorScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.AutoMirrored.Filled.CallSplit, null,
+                            Icon(Icons.AutoMirrored.Filled.CallSplit,
+                                contentDescription = stringResource(R.string.desc_split_icon),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(20.dp))
                             Spacer(Modifier.width(8.dp))
@@ -259,8 +283,8 @@ fun CalculatorScreen(
                     }
 
                     AnimatedVisibility(visible = splitEnabled,
-                        enter = fadeIn() + expandVertically(),
-                        exit  = fadeOut() + shrinkVertically()) {
+                        enter = getDefaultEnterTransition(),
+                        exit  = getDefaultExitTransition()) {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Row(modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -280,7 +304,9 @@ fun CalculatorScreen(
                                     modifier = Modifier.weight(1f)
                                 )
                             }
-                            AnimatedVisibility(visible = customSplitInput.isNotEmpty() || splitCount > 5) {
+                            AnimatedVisibility(visible = customSplitInput.isNotEmpty() || splitCount > 5,
+                                enter = getDefaultEnterTransition(),
+                                exit  = getDefaultExitTransition()) {
                                 OutlinedTextField(
                                     value = customSplitInput,
                                     onValueChange = viewModel::onCustomSplitChange,
@@ -296,8 +322,8 @@ fun CalculatorScreen(
 
                     // Per-person total
                     AnimatedVisibility(visible = splitEnabled && hasResult,
-                        enter = fadeIn() + expandVertically(),
-                        exit  = fadeOut() + shrinkVertically()) {
+                        enter = getDefaultEnterTransition(),
+                        exit  = getDefaultExitTransition()) {
                         Column {
                             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                             Row(
@@ -334,6 +360,7 @@ fun CalculatorScreen(
                     onClick  = {
                         viewModel.saveToHistory()
                         freemiumVm.trackCalculation(context)
+                        freemiumVm.recordAction()
                         freemiumVm.maybeRequestReview(context as android.app.Activity)
                     },
                     enabled  = hasResult && !saveConfirmed,
@@ -378,6 +405,18 @@ fun CalculatorScreen(
 
         item { PremiumBannerSection(modifier = Modifier.fillMaxWidth()) }
         item { Spacer(Modifier.height(16.dp)) }
+    }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            snackbar = { snackbarData ->
+                Snackbar(
+                    snackbarData = snackbarData,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        )
     }
 }
 

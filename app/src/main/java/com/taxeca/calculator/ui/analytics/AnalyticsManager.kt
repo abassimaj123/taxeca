@@ -19,6 +19,7 @@ class AnalyticsManager @Inject constructor(
     /** Log a Firebase Analytics event with optional key/value params. */
     fun log(event: String, vararg params: Pair<String, Any?>) {
         val bundle = Bundle()
+        bundle.putString("app_name", "TaxeCA")
         params.forEach { (key, value) ->
             when (value) {
                 is String -> bundle.putString(key, value)
@@ -33,6 +34,22 @@ class AnalyticsManager @Inject constructor(
     }
 
     fun setUserProperty(name: String, value: String) = fa.setUserProperty(name, value)
+
+    // ── Named funnel events ───────────────────────────────────────────────────
+
+    fun logAppOpen()           = log("app_open")
+    fun logPaywallShown(type: String) = log("paywall_shown", "type" to type)
+    fun logPaywallDismissed()  = log("paywall_dismissed")
+    fun logPurchaseStarted()   = log("iap_purchase_started")
+    fun logPurchaseSuccess()   = log("iap_purchase_success")
+    fun logPurchaseError(reason: String) = log("iap_purchase_error", "reason" to reason)
+    fun logRewardedAdShown()     = log("rewarded_ad_shown")
+    fun logRewardedAdCompleted() = log("rewarded_ad_completed")
+    fun logRewardedAdFailed()    = log("rewarded_ad_failed")
+    fun logRewardedDailyLimit()  = log("rewarded_daily_limit_reached")
+    fun logBannerAdFailed()      = log("banner_ad_failed")
+
+    // ── Crashlytics helpers ───────────────────────────────────────────────────
 
     fun setKey(key: String, value: String)  = crashlytics.setCustomKey(key, value)
     fun setKey(key: String, value: Boolean) = crashlytics.setCustomKey(key, value)

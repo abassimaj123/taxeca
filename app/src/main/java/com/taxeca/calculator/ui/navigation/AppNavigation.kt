@@ -65,6 +65,7 @@ import com.taxeca.calculator.ui.screens.ShoppingScreen
 import com.taxeca.calculator.ui.theme.GradientEnd
 import com.taxeca.calculator.ui.theme.GradientMid
 import com.taxeca.calculator.ui.theme.GradientStart
+import com.taxeca.calculator.ui.theme.PremiumGold
 import com.taxeca.calculator.ui.viewmodel.FreemiumViewModel
 import com.taxeca.calculator.ui.viewmodel.SettingsViewModel
 
@@ -73,12 +74,12 @@ val LocalFreemiumViewModel = compositionLocalOf<FreemiumViewModel> {
 }
 
 sealed class Screen(val route: String) {
-    data object Calculator    : Screen("calculator")
-    data object Shopping      : Screen("shopping")
-    data object Restaurant    : Screen("restaurant")
-    data object History       : Screen("history")
-    data object Settings      : Screen("settings")
-    data object HistoryDetail : Screen("history_detail/{entryId}") {
+    data object Calculator      : Screen("calculator")
+    data object Shopping        : Screen("shopping")
+    data object Restaurant      : Screen("restaurant")
+    data object History         : Screen("history")
+    data object Settings        : Screen("settings")
+    data object HistoryDetail   : Screen("history_detail/{entryId}") {
         fun route(id: Long) = "history_detail/$id"
     }
 }
@@ -111,6 +112,7 @@ fun AppNavigation() {
     val currentDestination   = navBackStackEntry?.destination
     val isOnHistoryDetail    = currentDestination?.route?.startsWith("history_detail") == true
     val isOnSettings         = currentDestination?.route == Screen.Settings.route
+    val isOnSecondary        = isOnHistoryDetail || isOnSettings
 
     val isPremium by freemiumVm.isPremium.collectAsStateWithLifecycle()
 
@@ -122,14 +124,13 @@ fun AppNavigation() {
     var paywallVisible by remember { mutableStateOf(false) }
     LaunchedEffect(showPaywall) { if (showPaywall) paywallVisible = true }
 
-    if (paywallVisible) {
-        UnlockBottomSheet(onDismiss = {
-            paywallVisible = false
-            freemiumVm.dismissPaywall()
-        })
-    }
-
     CompositionLocalProvider(LocalFreemiumViewModel provides freemiumVm) {
+        if (paywallVisible) {
+            UnlockBottomSheet(onDismiss = {
+                paywallVisible = false
+                freemiumVm.dismissPaywall()
+            })
+        }
         Scaffold(
             topBar = {
                 Box(
@@ -165,7 +166,7 @@ fun AppNavigation() {
                                 IconButton(onClick = { paywallVisible = true }) {
                                     Icon(
                                         imageVector = Icons.Outlined.Lock,
-                                        contentDescription = "Watch ad — 60 min free",
+                                        contentDescription = stringResource(R.string.content_desc_watch_ad_free),
                                         tint = Color.White,
                                         modifier = Modifier.size(22.dp)
                                     )
@@ -174,8 +175,8 @@ fun AppNavigation() {
                             if (isPremium) {
                                 Icon(
                                     imageVector = Icons.Default.WorkspacePremium,
-                                    contentDescription = "Premium active",
-                                    tint = Color(0xFFD4A017),
+                                    contentDescription = stringResource(R.string.premium_active_label),
+                                    tint = PremiumGold,
                                     modifier = Modifier.size(22.dp)
                                 )
                                 Spacer(Modifier.width(4.dp))
@@ -186,13 +187,13 @@ fun AppNavigation() {
                                     Icon(
                                         imageVector = Icons.Default.WorkspacePremium,
                                         contentDescription = stringResource(R.string.premium_unlock_btn),
-                                        tint = Color(0xFFD4A017),
+                                        tint = PremiumGold,
                                         modifier = Modifier.size(16.dp)
                                     )
                                     Spacer(Modifier.width(4.dp))
                                     Text(
-                                        text = "Premium",
-                                        color = Color(0xFFD4A017),
+                                        text = stringResource(R.string.settings_premium_section),
+                                        color = PremiumGold,
                                         fontWeight = FontWeight.Bold,
                                         style = MaterialTheme.typography.labelMedium
                                     )
@@ -219,7 +220,7 @@ fun AppNavigation() {
                 }
             },
             bottomBar = {
-                if (!isOnHistoryDetail && !isOnSettings) {
+                if (!isOnSecondary) {
                     NavigationBar(tonalElevation = 8.dp) {
                         navItems.forEach { item ->
                             val selected = currentDestination?.hierarchy

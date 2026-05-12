@@ -187,10 +187,10 @@ class CalculatorViewModel @Inject constructor(
         _tipPreset.value         = 0.15
         _customTipInput.value    = ""
         _customTipIsAmount.value = false
-        _splitEnabled.value   = false
-        _splitCount.value     = 2
-        _customSplitInput.value = ""
-        _saveConfirmed.value  = false
+        _splitEnabled.value      = false
+        _splitCount.value        = 2
+        _customSplitInput.value  = ""
+        _saveConfirmed.value     = false
     }
 
     private fun scheduleCalculation() {

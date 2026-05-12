@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -122,7 +124,15 @@ fun HistoryScreen(
         )
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
+    Column(modifier = Modifier
+        .widthIn(max = 560.dp)
+        .fillMaxWidth()
+        .fillMaxHeight()
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -165,7 +175,7 @@ fun HistoryScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Lock,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.desc_lock_icon),
                         tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.size(12.dp)
                     )
@@ -186,7 +196,8 @@ fun HistoryScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Icon(
-                        Icons.Default.History, null,
+                        Icons.Default.History,
+                        contentDescription = stringResource(R.string.desc_history_icon),
                         modifier = Modifier.size(48.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f)
                     )
@@ -267,6 +278,7 @@ fun HistoryScreen(
             }
         }
     }
+    } // end Box
 }
 
 // ── Compact card ──────────────────────────────────────────────────────────────
@@ -279,7 +291,6 @@ private fun HistoryCompactCard(
     onDelete: () -> Unit
 ) {
     val locale  = Locale.getDefault()
-    val isFr    = locale.language == "fr"
     val dateStr = SimpleDateFormat("d MMM yyyy  HH:mm", locale).format(Date(entity.timestamp))
 
     val icon = when (entity.mode) {
@@ -330,8 +341,7 @@ private fun HistoryCompactCard(
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = if (isFr) "Total : ${CurrencyFormatter.formatAmount(entity.totalAmount)}"
-                               else "Total: ${CurrencyFormatter.formatAmount(entity.totalAmount)}",
+                        text = stringResource(R.string.history_card_total, CurrencyFormatter.formatAmount(entity.totalAmount)),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = AccentGreen

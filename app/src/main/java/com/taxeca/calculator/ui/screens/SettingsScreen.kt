@@ -69,7 +69,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
     ) {
 
         // ── Language ──────────────────────────────────────────────────────────
-        _SectionHeader(stringResource(R.string.settings_language))
+        SectionHeader(stringResource(R.string.settings_language))
         Spacer(Modifier.height(8.dp))
         Row(
             modifier = Modifier
@@ -114,7 +114,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
         HorizontalDivider()
 
         // ── Premium ───────────────────────────────────────────────────────────
-        _SectionHeader(stringResource(R.string.settings_premium_section))
+        SectionHeader(stringResource(R.string.settings_premium_section))
         if (isPremium) {
             ListItem(
                 leadingContent = {
@@ -131,13 +131,13 @@ fun SettingsScreen(languageManager: LanguageManager) {
                 }
             )
         } else {
-            _SettingsTile(
+            SettingsTile(
                 icon     = Icons.Outlined.Star,
                 label    = stringResource(R.string.premium_buy_btn),
                 subtitle = stringResource(R.string.settings_premium_subtitle),
                 onClick  = { activity?.let { freemiumVm.buyPremium(it) } }
             )
-            _SettingsTile(
+            SettingsTile(
                 icon    = Icons.Outlined.Restore,
                 label   = stringResource(R.string.premium_restore_btn),
                 onClick = { activity?.let { freemiumVm.restorePurchases(it) } }
@@ -146,8 +146,8 @@ fun SettingsScreen(languageManager: LanguageManager) {
         HorizontalDivider()
 
         // ── Support ───────────────────────────────────────────────────────────
-        _SectionHeader(stringResource(R.string.settings_support))
-        _SettingsTile(
+        SectionHeader(stringResource(R.string.settings_support))
+        SettingsTile(
             icon    = Icons.Outlined.Email,
             label   = stringResource(R.string.settings_contact),
             onClick = {
@@ -158,7 +158,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
                 context.startActivity(intent)
             }
         )
-        _SettingsTile(
+        SettingsTile(
             icon    = Icons.Outlined.PrivacyTip,
             label   = stringResource(R.string.settings_privacy),
             onClick = {
@@ -170,8 +170,8 @@ fun SettingsScreen(languageManager: LanguageManager) {
         HorizontalDivider()
 
         // ── About ─────────────────────────────────────────────────────────────
-        _SectionHeader(stringResource(R.string.settings_about))
-        _SettingsTile(
+        SectionHeader(stringResource(R.string.settings_about))
+        SettingsTile(
             icon     = Icons.Outlined.Apps,
             label    = stringResource(R.string.settings_other_apps),
             subtitle = stringResource(R.string.settings_website_display),
@@ -204,7 +204,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
 // ── Reusable components ───────────────────────────────────────────────────────
 
 @Composable
-private fun _SectionHeader(title: String) {
+private fun SectionHeader(title: String) {
     Text(
         text     = title.uppercase(),
         style    = MaterialTheme.typography.labelSmall,
@@ -215,7 +215,7 @@ private fun _SectionHeader(title: String) {
 }
 
 @Composable
-private fun _SettingsTile(
+private fun SettingsTile(
     icon: ImageVector,
     label: String,
     subtitle: String? = null,

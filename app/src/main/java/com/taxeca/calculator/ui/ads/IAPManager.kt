@@ -26,8 +26,15 @@ class IAPManager @Inject constructor(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    /** Initialised to false; FreemiumViewModel will seed from cached value on first launch. */
     private val _isPremium = MutableStateFlow(false)
     val isPremium: StateFlow<Boolean> = _isPremium
+
+    /** Allows external callers to pre-seed the premium state from persisted cache. */
+    fun seedPremium(cached: Boolean) {
+        if (_isPremium.value) return   // already confirmed by BillingClient — don't downgrade
+        _isPremium.value = cached
+    }
 
     private val _premiumPrice = MutableStateFlow<String?>(null)
     val premiumPrice: StateFlow<String?> = _premiumPrice
@@ -44,22 +51,35 @@ class IAPManager @Inject constructor(
         connect()
     }
 
-    private fun connect() {
-        billingClient.startConnection(object : BillingClientStateListener {
-            override fun onBillingSetupFinished(result: BillingResult) {
-                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                    Log.d(TAG, "BillingClient connected")
-                    scope.launch {
-                        queryExistingPurchases()
-                        queryProductPrice()
+    private var reconnectAttempts = 0
+    private val maxReconnectAttempts = 5
+
+    private fun connect(delayMs: Long = 0L) {
+        if (reconnectAttempts >= maxReconnectAttempts) {
+            Log.w(TAG, "BillingClient: max reconnect attempts reached — giving up")
+            return
+        }
+        scope.launch {
+            if (delayMs > 0) kotlinx.coroutines.delay(delayMs)
+            billingClient.startConnection(object : BillingClientStateListener {
+                override fun onBillingSetupFinished(result: BillingResult) {
+                    if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                        Log.d(TAG, "BillingClient connected (attempt ${reconnectAttempts + 1})")
+                        reconnectAttempts = 0 // reset on success
+                        scope.launch {
+                            queryExistingPurchases()
+                            queryProductPrice()
+                        }
                     }
                 }
-            }
-            override fun onBillingServiceDisconnected() {
-                Log.d(TAG, "BillingClient disconnected — retrying")
-                connect()
-            }
-        })
+                override fun onBillingServiceDisconnected() {
+                    reconnectAttempts++
+                    val backoffMs = minOf(1000L * (1 shl reconnectAttempts), 30_000L) // 2s, 4s, 8s … 30s cap
+                    Log.w(TAG, "BillingClient disconnected — retry #$reconnectAttempts in ${backoffMs}ms")
+                    connect(backoffMs)
+                }
+            })
+        }
     }
 
     private suspend fun queryProductPrice() {

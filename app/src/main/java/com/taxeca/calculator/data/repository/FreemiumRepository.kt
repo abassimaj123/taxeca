@@ -2,6 +2,7 @@ package com.taxeca.calculator.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -26,6 +27,15 @@ class FreemiumRepository @Inject constructor(
     private val KEY_REWARDED_COUNT = intPreferencesKey("rewarded_count_today")
     private val KEY_SESSION_COUNT  = intPreferencesKey("paywall_session_count")
     private val KEY_LAST_SESSION_MS = longPreferencesKey("last_session_timestamp_ms")
+    /** Persisted premium flag — avoids "flash paywall" race on startup while BillingClient reconnects. */
+    private val KEY_IS_PREMIUM     = booleanPreferencesKey("is_premium_cached")
+
+    /** Synchronously readable cached premium status — true if last verified purchase was premium. */
+    val isPremiumCached: Flow<Boolean> = dataStore.data.map { it[KEY_IS_PREMIUM] ?: false }
+
+    suspend fun setPremiumCached(isPremium: Boolean) {
+        dataStore.edit { it[KEY_IS_PREMIUM] = isPremium }
+    }
 
     val sessionCount: Flow<Int> = dataStore.data.map { it[KEY_SESSION_COUNT] ?: 0 }
 
@@ -84,5 +94,13 @@ class FreemiumRepository @Inject constructor(
         }
     }
 
-    private fun todayOfYear(): Int = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
+    /**
+     * Returns a unique integer per calendar day — never collides across years.
+     * Formula: year * 1000 + dayOfYear (fits comfortably in Int for centuries).
+     * Fixes the Dec-31 rollover bug where DAY_OF_YEAR alone is the same across years.
+     */
+    private fun todayOfYear(): Int {
+        val cal = Calendar.getInstance()
+        return cal.get(Calendar.YEAR) * 1000 + cal.get(Calendar.DAY_OF_YEAR)
+    }
 }

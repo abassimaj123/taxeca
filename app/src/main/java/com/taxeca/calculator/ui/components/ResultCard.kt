@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.taxeca.calculator.R
 import com.taxeca.calculator.domain.model.TaxResult
+import com.taxeca.calculator.domain.model.taxLines
 import com.taxeca.calculator.ui.theme.AccentGreen
 import com.taxeca.calculator.utils.CurrencyFormatter
 
@@ -167,32 +168,17 @@ fun ResultCard(
 
 @Composable
 private fun TaxDonutChart(taxResult: TaxResult) {
-    val primary   = MaterialTheme.colorScheme.primary
-    val secondary = MaterialTheme.colorScheme.secondary
-    val tertiary  = MaterialTheme.colorScheme.tertiary
+    // Theme colours — tertiary (Amber) is now defined in Theme.kt, visually distinct from red/teal
+    val segmentColors = listOf(
+        MaterialTheme.colorScheme.primary,    // GST or HST — Canada Red
+        MaterialTheme.colorScheme.secondary,  // PST / QST / RST — Teal
+        MaterialTheme.colorScheme.tertiary    // 3rd component if ever needed — Amber
+    )
 
-    // Resolve labels at composable scope before building segment list
-    val labelGst = stringResource(R.string.label_gst)
-    val labelPst = stringResource(R.string.label_pst)
-    val labelQst = stringResource(R.string.label_qst)
-    val labelRst = stringResource(R.string.label_rst)
-    val labelHst = stringResource(R.string.label_hst)
-
-    // Build non-zero segments: (label, amount, color)
+    // taxLines() eliminates the isHstProvince if-else duplication from this composable
     data class Segment(val label: String, val amount: Double, val color: Color)
-    val segments = buildList {
-        if (!taxResult.province.isHstProvince && taxResult.gstAmount > 0)
-            add(Segment(labelGst, taxResult.gstAmount, primary))
-        if (!taxResult.province.isHstProvince && taxResult.pstAmount > 0) {
-            val label = when (taxResult.province.pstLabel) {
-                "QST" -> labelQst
-                "RST" -> labelRst
-                else  -> labelPst
-            }
-            add(Segment(label, taxResult.pstAmount, secondary))
-        }
-        if (taxResult.province.isHstProvince && taxResult.hstAmount > 0)
-            add(Segment(labelHst, taxResult.hstAmount, tertiary))
+    val segments = taxResult.taxLines().mapIndexed { i, line ->
+        Segment(line.label, line.amount, segmentColors.getOrElse(i) { segmentColors.last() })
     }
 
     if (segments.isEmpty()) return

@@ -52,3 +52,12 @@ val GradientEnd   = Color(0xFFE53935)
 
 // Premium badge
 val PremiumGold = Color(0xFFD4A017)
+
+// Tertiary — amber/gold family (used by TaxDonutChart 3rd segment & Material3 tertiary slot)
+val Amber10  = Color(0xFF2C1600)
+val Amber20  = Color(0xFF4B2800)
+val Amber30  = Color(0xFF6D3C00)
+val Amber40  = Color(0xFF8F5200)
+val Amber    = Color(0xFFFFB300)   // Material Design Amber 700 — visually distinct from red+teal
+val Amber80  = Color(0xFFFFD180)
+val Amber90  = Color(0xFFFFECB3)

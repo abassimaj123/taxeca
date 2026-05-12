@@ -203,15 +203,11 @@ class CalculatorViewModel @Inject constructor(
                 val province = _selectedProvince.value
                 analytics.setKey("province", province.code)
                 analytics.setKey("screen", "Calculator")
+                // Analytics logged only on Save (saveToHistory) to avoid per-keystroke event spam.
+                // Crashlytics keys kept here for debugging context if a crash happens.
                 _taxResult.value = when (_mode.value) {
-                    CalculationMode.FORWARD -> {
-                        analytics.log("calc_tax_forward", "province" to province.code, "amount" to input)
-                        calculateTax(input, province)
-                    }
-                    CalculationMode.REVERSE -> {
-                        analytics.log("calc_tax_reverse", "province" to province.code, "amount" to input)
-                        reverseCalculateTax(input, province)
-                    }
+                    CalculationMode.FORWARD -> calculateTax(input, province)
+                    CalculationMode.REVERSE -> reverseCalculateTax(input, province)
                 }
             } catch (e: Exception) {
                 analytics.recordException(e)

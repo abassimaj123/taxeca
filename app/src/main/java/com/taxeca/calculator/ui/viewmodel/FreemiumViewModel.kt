@@ -79,11 +79,20 @@ class FreemiumViewModel @Inject constructor(
 
     init {
         adManager.preloadInterstitial()
+        viewModelScope.launch {
+            // Seed IAPManager with cached premium status to eliminate "flash paywall" on startup
+            // while BillingClient reconnects asynchronously (~500ms delay).
+            val cached = freemiumRepo.isPremiumCached.first()
+            if (cached) iapManager.seedPremium(true)
+        }
         startExpiryTimer()
-        // Observe isPremium changes → update hasAccess
+        // Observe isPremium changes → update hasAccess + persist to cache
         viewModelScope.launch {
             iapManager.isPremium.collect { premium ->
-                if (premium) _hasAccess.value = true
+                if (premium) {
+                    _hasAccess.value = true
+                    freemiumRepo.setPremiumCached(true) // persist for next launch
+                }
             }
         }
     }

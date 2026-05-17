@@ -6,17 +6,23 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.getValue
 import com.taxeca.calculator.data.repository.LanguageManager
 import com.taxeca.calculator.ui.navigation.AppNavigation
 import com.taxeca.calculator.ui.theme.TaxeCATheme
+import com.taxeca.calculator.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private val settingsVm: SettingsViewModel by viewModels()
+
     override fun attachBaseContext(newBase: Context) {
-        // Apply saved language before Hilt/Compose are available
         val prefs  = newBase.getSharedPreferences(LanguageManager.PREFS_NAME, Context.MODE_PRIVATE)
         val lang   = prefs.getString(LanguageManager.KEY_LANG, null)
             ?: Locale.getDefault().language.takeIf { it == LanguageManager.LANG_FR }
@@ -32,7 +38,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            TaxeCATheme {
+            val themeMode by settingsVm.themeMode.collectAsStateWithLifecycle()
+            val darkTheme = when (themeMode) {
+                "dark"  -> true
+                "light" -> false
+                else    -> isSystemInDarkTheme()
+            }
+            TaxeCATheme(darkTheme = darkTheme) {
                 AppNavigation()
             }
         }

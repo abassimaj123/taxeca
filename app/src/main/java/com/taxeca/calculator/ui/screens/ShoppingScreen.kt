@@ -419,6 +419,21 @@ private fun ShoppingSummaryCard(result: ShoppingListResult) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
+            // Items list
+            if (result.items.isNotEmpty()) {
+                Text(
+                    text       = stringResource(R.string.history_detail_items),
+                    style      = MaterialTheme.typography.labelLarge,
+                    color      = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp))
+                result.items.forEach { itemResult ->
+                    SummaryRow(itemResult.item.displayName, fmt(itemResult.item.price))
+                }
+                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            }
+
             // Subtotal
             SummaryRow(stringResource(R.string.shopping_subtotal), fmt(result.subtotal))
 

@@ -43,12 +43,14 @@ import com.taxeca.calculator.BuildConfig
 import com.taxeca.calculator.R
 import com.taxeca.calculator.data.repository.LanguageManager
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
+import com.taxeca.calculator.ui.viewmodel.SettingsViewModel
 
 @Composable
-fun SettingsScreen(languageManager: LanguageManager) {
+fun SettingsScreen(languageManager: LanguageManager, settingsVm: SettingsViewModel) {
     val freemiumVm = LocalFreemiumViewModel.current
     val isPremium  by freemiumVm.isPremium.collectAsStateWithLifecycle()
     val isFrench   by languageManager.isFrench.collectAsStateWithLifecycle()
+    val themeMode  by settingsVm.themeMode.collectAsStateWithLifecycle()
     val context    = LocalContext.current
     val activity   = context as? Activity
 
@@ -98,6 +100,37 @@ fun SettingsScreen(languageManager: LanguageManager) {
             ) {
                 Icon(Icons.Outlined.Language, null, modifier = Modifier.padding(end = 6.dp))
                 Text("English", fontWeight = FontWeight.Medium)
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        HorizontalDivider()
+
+        // ── Theme ─────────────────────────────────────────────────────────────
+        _SectionHeader(stringResource(R.string.settings_theme))
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            listOf(
+                "auto"  to stringResource(R.string.settings_theme_auto),
+                "dark"  to stringResource(R.string.settings_theme_dark),
+                "light" to stringResource(R.string.settings_theme_light)
+            ).forEachIndexed { index, (mode, label) ->
+                if (index > 0) Spacer(Modifier.width(8.dp))
+                OutlinedButton(
+                    onClick  = { settingsVm.setThemeMode(mode) },
+                    modifier = Modifier.weight(1f),
+                    colors   = ButtonDefaults.outlinedButtonColors(
+                        containerColor = if (themeMode == mode) MaterialTheme.colorScheme.primary
+                                         else MaterialTheme.colorScheme.surface,
+                        contentColor   = if (themeMode == mode) MaterialTheme.colorScheme.onPrimary
+                                         else MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
+                    Text(label, fontWeight = FontWeight.Medium)
+                }
             }
         }
         Spacer(Modifier.height(8.dp))

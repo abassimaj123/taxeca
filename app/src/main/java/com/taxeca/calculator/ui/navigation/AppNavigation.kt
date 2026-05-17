@@ -271,7 +271,7 @@ fun AppNavigation() {
                     )
                 }
                 composable(Screen.Settings.route) {
-                    SettingsScreen(languageManager = settingsVm.languageManager)
+                    SettingsScreen(languageManager = settingsVm.languageManager, settingsVm = settingsVm)
                 }
                 composable(
                     route     = Screen.HistoryDetail.route,

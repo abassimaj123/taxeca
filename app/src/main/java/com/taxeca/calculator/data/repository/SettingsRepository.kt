@@ -14,14 +14,25 @@ class SettingsRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
     private val lastProvinceKey = stringPreferencesKey("last_province_code")
+    private val themeModeKey    = stringPreferencesKey("theme_mode")
 
     val lastProvinceCode: Flow<String> = dataStore.data.map { prefs ->
         prefs[lastProvinceKey] ?: "QC"
     }
 
+    val themeMode: Flow<String> = dataStore.data.map { prefs ->
+        prefs[themeModeKey] ?: "auto"
+    }
+
     suspend fun saveLastProvince(code: String) {
         dataStore.edit { prefs ->
             prefs[lastProvinceKey] = code
+        }
+    }
+
+    suspend fun saveThemeMode(mode: String) {
+        dataStore.edit { prefs ->
+            prefs[themeModeKey] = mode
         }
     }
 }

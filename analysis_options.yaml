@@ -53,6 +53,8 @@ linter:
     - "**/*.chopper.dart"
 
 analyzer:
+  plugins:
+    - custom_lint
   exclude:
     - "build/**"
     - ".dart_tool/**"
@@ -71,3 +73,9 @@ analyzer:
     strict-casts: true          # ✅ No implicit casts (int → dynamic → String)
     strict-inference: true      # ✅ Require explicit types (no var where type unknown)
     strict-raw-types: true      # ✅ No dynamic types without annotation
+
+custom_lint:
+  rules:
+    - prefer_app_spacing: true
+    - prefer_app_radius: true
+    - prefer_semantic_colors: true

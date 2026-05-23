@@ -32,10 +32,10 @@ class ReverseCalculateTaxUseCaseTest {
         assertEquals(15.0, result.hstAmount, DELTA)
     }
 
-    @Test fun `NS HST 17 percent reverse 117 base 100 17 HST`() {
-        val result = useCase(117.0, Province.NS)
+    @Test fun `NS HST 14 percent reverse 114 base 100 14 HST`() {
+        val result = useCase(114.0, Province.NS)
         assertEquals(100.0, result.baseAmount, DELTA)
-        assertEquals(17.0, result.hstAmount, DELTA)
+        assertEquals(14.0, result.hstAmount, DELTA)
     }
 
     @Test fun `PE HST reverse 115 base 100 15 HST`() {

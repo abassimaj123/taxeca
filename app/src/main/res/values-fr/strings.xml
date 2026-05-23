@@ -143,7 +143,7 @@
     <string name="tooltip_rst_title">TDV — Taxe de vente au détail</string>
     <string name="tooltip_rst_body">Taxe provinciale de vente au détail du Manitoba de 7 %, appliquée sur le montant de base avant TPS.</string>
     <string name="tooltip_hst_title">TVH — Taxe de vente harmonisée</string>
-    <string name="tooltip_hst_body" formatted="false">Une taxe unique combinant la part fédérale de la TPS (5 %) et la part provinciale en un seul taux. Applicable au N.-B. (15 %), T.-N.-L. (15 %), N.-É. (17 %), Ont. (13 %) et Î.-P.-É. (15 %). La Nouvelle-Écosse a augmenté son taux à 17 % le 1er avril 2025.</string>
+    <string name="tooltip_hst_body" formatted="false">Une taxe unique combinant la part fédérale de la TPS (5 %) et la part provinciale en un seul taux. Applicable au N.-B. (15 %), T.-N.-L. (15 %), N.-É. (14 %), Ont. (13 %) et Î.-P.-É. (15 %). La Nouvelle-Écosse a réduit son taux à 14 % le 1er avril 2025 (baisse depuis 15 %).</string>
     <string name="premium_gate_title">Historique verrouillé</string>
     <string name="premium_gate_message">Regardez une pub pour 1 heure d\'accès, ou obtenez Premium pour un historique illimité.</string>
 

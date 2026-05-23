@@ -145,7 +145,7 @@
     <string name="tooltip_rst_title">RST — Retail Sales Tax</string>
     <string name="tooltip_rst_body">Manitoba\'s provincial retail sales tax of 7%, applied on the base amount before GST.</string>
     <string name="tooltip_hst_title">HST — Harmonized Sales Tax</string>
-    <string name="tooltip_hst_body" formatted="false">A single tax that combines the federal GST (5%) and the provincial portion into one rate. Applied in NB (15%), NL (15%), NS (17%), ON (13%), and PE (15%). Nova Scotia raised its rate to 17% effective April 1, 2025.</string>
+    <string name="tooltip_hst_body" formatted="false">A single tax that combines the federal GST (5%) and the provincial portion into one rate. Applied in NB (15%), NL (15%), NS (14%), ON (13%), and PE (15%). Nova Scotia reduced its rate to 14% effective April 1, 2025 (down from 15%).</string>
     <string name="premium_gate_title">History locked</string>
     <string name="premium_gate_message">Watch an ad for 1 hour of access, or get Premium for unlimited history.</string>
 

@@ -50,8 +50,8 @@ class ProvinceModelTest {
         assertEquals(0.0, Province.AB.pstRate, 0.0001)
     }
 
-    @Test fun `NS HST rate is 17 percent (April 2025 update)`() {
-        assertEquals(0.17, Province.NS.hstRate, 0.0001)
+    @Test fun `NS HST rate is 14 percent (April 2025 baisse de 15 a 14)`() {
+        assertEquals(0.14, Province.NS.hstRate, 0.0001)
     }
 
     // ── HST Province Identification ───────────────────────────────────────────

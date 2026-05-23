@@ -116,18 +116,18 @@ class TaxCalculationTest {
         assertEquals(115.0, r.totalAmount, DELTA)
     }
 
-    // ── Nouvelle-Écosse ─── 17 % TVH depuis le 1er avril 2025 ────────────────
+    // ── Nouvelle-Écosse ─── 14 % TVH depuis le 1er avril 2025 (baisse de 15%) ──
 
-    @Test fun `NS forward 100 HST 17 00 total 117 00`() {
+    @Test fun `NS forward 100 HST 14 00 total 114 00`() {
         val r = calcTax(100.0, Province.NS)
-        assertEquals(17.0, r.hstAmount,  DELTA)
-        assertEquals(117.0, r.totalAmount, DELTA)
+        assertEquals(14.0, r.hstAmount,  DELTA)
+        assertEquals(114.0, r.totalAmount, DELTA)
     }
 
-    @Test fun `NS inverse 117 00 base 100 00`() {
-        val r = reverseTax(117.0, Province.NS)
+    @Test fun `NS inverse 114 00 base 100 00`() {
+        val r = reverseTax(114.0, Province.NS)
         assertEquals(100.0, r.baseAmount, DELTA)
-        assertEquals(17.0,  r.hstAmount,  DELTA)
+        assertEquals(14.0,  r.hstAmount,  DELTA)
     }
 
     // ── Île-du-Prince-Édouard ─────────────────────────────────────────────────

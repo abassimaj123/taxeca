@@ -1,8 +1,9 @@
 package com.taxeca.calculator.ui.screens
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,7 +55,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
     val isPremium  by freemiumVm.isPremium.collectAsStateWithLifecycle()
     val isFrench   by languageManager.isFrench.collectAsStateWithLifecycle()
     val context    = LocalContext.current
-    val activity   = context as? Activity
+    val activity   = context as? android.app.Activity
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -79,7 +80,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
             OutlinedButton(
                 onClick = {
                     languageManager.setLanguage(LanguageManager.LANG_FR)
-                    activity?.recreate()
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("fr"))
                 },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.outlinedButtonColors(
@@ -96,7 +97,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
             OutlinedButton(
                 onClick = {
                     languageManager.setLanguage(LanguageManager.LANG_EN)
-                    activity?.recreate()
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en"))
                 },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.outlinedButtonColors(

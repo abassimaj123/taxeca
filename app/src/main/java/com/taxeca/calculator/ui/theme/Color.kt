@@ -42,8 +42,8 @@ val BlueGrey80 = Color(0xFFC3C7CF)
 val BlueGrey90 = Color(0xFFDFE2EB)
 
 // Accent green (totals / grand totals)
-val AccentGreen  = Color(0xFF2ECC71)
-val AccentGreenDark = Color(0xFF27AE60)
+val AccentGreen  = Color(0xFF16A34A)
+val AccentGreenDark = Color(0xFF15803D)
 
 // Gradient colours
 val GradientStart = Color(0xFF8E0000)

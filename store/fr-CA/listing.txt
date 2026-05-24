@@ -1,0 +1,21 @@
+App: Calculateur de taxes Canada — TaxeCA
+Langues: Français, Anglais
+
+Description courte:
+Calculez vos impôts fédéraux et provinciaux canadiens instantanément — toutes les provinces, 2024.
+
+Description complète:
+TaxeCA vous aide à estimer votre impôt fédéral et provincial au Canada rapidement et avec précision.
+
+Fonctionnalités:
+- Calcul de l'impôt fédéral canadien (tranches 2024)
+- Impôt provincial pour toutes les provinces et territoires
+- Cotisations au RPC et à l'AE
+- Taux effectif et taux marginal d'imposition
+- Décomposition des tranches d'imposition
+- Estimateur de revenu net après impôts
+
+Confidentialité / LPRPDE:
+Aucune donnée personnelle n'est vendue ou partagée. Contact: abassimaj@gmail.com
+
+Contact: abassimaj@gmail.com

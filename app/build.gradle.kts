@@ -88,6 +88,13 @@ android {
         compose     = true
         buildConfig = true
     }
+
+    lint {
+        // Baseline suppresses pre-existing RemoteViewLayout widget issue
+        // (App widget uses a custom view; fix tracked separately)
+        baseline = file("lint-baseline.xml")
+        abortOnError = true
+    }
 }
 
 dependencies {

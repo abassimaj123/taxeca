@@ -1,0 +1,21 @@
+App: Canada Tax Calculator — TaxeCA
+Languages: English, French
+
+Short Description:
+Calculate your Canadian federal and provincial income tax instantly — all provinces, 2024 brackets.
+
+Full Description:
+TaxeCA helps individuals estimate their federal and provincial income taxes in Canada quickly and accurately.
+
+Features:
+- Federal income tax calculation (2024 brackets)
+- Provincial tax for all provinces and territories
+- CPP and EI contributions
+- Effective tax rate and marginal rate display
+- Tax bracket breakdown
+- Net income estimator after all taxes
+
+Privacy / PIPEDA:
+No personal data is sold or shared. Contact: abassimaj@gmail.com
+
+Contact: abassimaj@gmail.com

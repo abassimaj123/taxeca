@@ -80,7 +80,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
             OutlinedButton(
                 onClick = {
                     languageManager.setLanguage(LanguageManager.LANG_FR)
-                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("fr"))
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("fr-CA"))
                 },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.outlinedButtonColors(
@@ -97,7 +97,7 @@ fun SettingsScreen(languageManager: LanguageManager) {
             OutlinedButton(
                 onClick = {
                     languageManager.setLanguage(LanguageManager.LANG_EN)
-                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en"))
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en-CA"))
                 },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.outlinedButtonColors(

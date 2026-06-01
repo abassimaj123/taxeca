@@ -57,7 +57,9 @@ import com.taxeca.calculator.ui.components.PillButton
 import com.taxeca.calculator.ui.components.ProvinceSelector
 import com.taxeca.calculator.ui.components.ResultCard
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
+import androidx.compose.foundation.isSystemInDarkTheme
 import com.taxeca.calculator.ui.theme.AccentGreen
+import com.taxeca.calculator.ui.theme.AccentGreenDark
 import com.taxeca.calculator.ui.viewmodel.CalculatorViewModel
 import com.taxeca.calculator.ui.viewmodel.TIP_CUSTOM
 import com.taxeca.calculator.ui.viewmodel.TIP_PRESETS
@@ -89,6 +91,8 @@ fun CalculatorScreen(
     val customSplitInput by viewModel.customSplitInput.collectAsStateWithLifecycle()
     val perPerson        by viewModel.perPerson.collectAsStateWithLifecycle()
     val saveConfirmed    by viewModel.saveConfirmed.collectAsStateWithLifecycle()
+
+    val accentGreen = if (isSystemInDarkTheme()) AccentGreenDark else AccentGreen
 
     val hasResult = taxResult != null && isInputValid
     val snackbarHostState = remember { SnackbarHostState() }
@@ -341,7 +345,7 @@ fun CalculatorScreen(
                                     text       = CurrencyFormatter.formatAmount(perPerson),
                                     style      = MaterialTheme.typography.headlineMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color      = AccentGreen
+                                    color      = accentGreen
                                 )
                             }
                         }
@@ -424,6 +428,7 @@ fun CalculatorScreen(
 
 @Composable
 private fun TipSummary(result: TaxResult, tipAmount: Double, grandTotal: Double) {
+    val accentGreen = if (isSystemInDarkTheme()) AccentGreenDark else AccentGreen
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         TipRow(stringResource(R.string.label_base_amount), CurrencyFormatter.formatAmount(result.baseAmount))
@@ -438,7 +443,7 @@ private fun TipSummary(result: TaxResult, tipAmount: Double, grandTotal: Double)
                 style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Text(CurrencyFormatter.formatAmount(grandTotal),
                 style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold, color = AccentGreen)
+                fontWeight = FontWeight.Bold, color = accentGreen)
         }
     }
 }

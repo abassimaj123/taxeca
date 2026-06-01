@@ -16,16 +16,23 @@ class LanguageManager @Inject constructor(
     companion object {
         const val PREFS_NAME = "taxeca_language"
         const val KEY_LANG   = "lang"
-        const val LANG_FR    = "fr"
-        const val LANG_EN    = "en"
+        const val LANG_FR    = "fr-CA"
+        const val LANG_EN    = "en-CA"
     }
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    /** Saved language code, or system default if never set. */
+    /** Saved language code, or system default if never set.
+     *  Migrates old "fr"/"en" keys to "fr-CA"/"en-CA" transparently. */
     val savedLang: String
-        get() = prefs.getString(KEY_LANG, null)
-            ?: Locale.getDefault().language.takeIf { it == LANG_FR } ?: LANG_EN
+        get() {
+            val saved = prefs.getString(KEY_LANG, null)
+            return when {
+                saved == null -> if (Locale.getDefault().language == "fr") LANG_FR else LANG_EN
+                saved.startsWith("fr") -> LANG_FR
+                else -> LANG_EN
+            }
+        }
 
     private val _isFrench = MutableStateFlow(savedLang == LANG_FR)
     val isFrench: StateFlow<Boolean> = _isFrench

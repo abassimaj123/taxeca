@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -101,9 +102,22 @@ class CalculatorViewModel @Inject constructor(
     private var calculateJob: Job? = null
 
     init {
+        _amountInput.value = "100"
         viewModelScope.launch {
             settingsRepo.lastProvinceCode.collect { code ->
-                _selectedProvince.value = Province.fromCode(code)
+                // Smart Auto: empty code = first launch, no explicit user selection.
+                // Detect province from device locale:
+                //   French (fr_*)  → QC  (most French Canadians are in Quebec)
+                //   English CA (en_CA) → ON  (most populous English-CA province)
+                //   Other → QC (international or unrecognized locale)
+                val resolvedCode = when {
+                    code.isNotEmpty() -> code  // Respect saved user preference
+                    Locale.getDefault().language == "fr" -> "QC"
+                    Locale.getDefault().country == "CA"  -> "ON"
+                    else -> "QC"
+                }
+                _selectedProvince.value = Province.fromCode(resolvedCode)
+                scheduleCalculation()
             }
         }
     }

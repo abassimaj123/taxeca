@@ -15,8 +15,9 @@ class SettingsRepository @Inject constructor(
 ) {
     private val lastProvinceKey = stringPreferencesKey("last_province_code")
 
+    // Empty string = first launch, no explicit selection → ViewModel applies Smart Auto
     val lastProvinceCode: Flow<String> = dataStore.data.map { prefs ->
-        prefs[lastProvinceKey] ?: "QC"
+        prefs[lastProvinceKey] ?: ""
     }
 
     suspend fun saveLastProvince(code: String) {

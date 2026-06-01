@@ -146,7 +146,7 @@ ctx.font = 'bold 18px Arial, sans-serif';
 ctx.fillStyle = 'rgba(255,255,255,0.75)';
 ctx.textAlign = 'center';
 ctx.textBaseline = 'middle';
-ctx.fillText('FREE  •  Bilingual FR/EN  •  All Provinces & Territories  •  Free to Use', W / 2, bannerY + bannerH / 2);
+ctx.fillText('FREE  •  Bilingual FR/EN  •  All Provinces & Territories  •  Premium $1.99', W / 2, bannerY + bannerH / 2);
 
 // ── Save ─────────────────────────────────────────────────────────────────────
 const outDir = path.join(__dirname, '..', 'store_assets');

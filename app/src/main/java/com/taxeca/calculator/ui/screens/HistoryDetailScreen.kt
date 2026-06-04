@@ -39,7 +39,10 @@ import com.taxeca.calculator.R
 import com.taxeca.calculator.data.model.HistoryEntity
 import com.taxeca.calculator.domain.model.Province
 import com.taxeca.calculator.ui.components.GradientButton
+import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
+import androidx.compose.foundation.isSystemInDarkTheme
 import com.taxeca.calculator.ui.theme.AccentGreen
+import com.taxeca.calculator.ui.theme.AccentGreenDark
 import com.taxeca.calculator.ui.viewmodel.HistoryDetailViewModel
 import com.taxeca.calculator.utils.CurrencyFormatter
 import org.json.JSONArray
@@ -105,6 +108,9 @@ fun HistoryDetailScreen(
         "REVERSE"    -> "$calcLabel (${stringResource(R.string.history_mode_reverse)})"
         else         -> entity.mode
     }
+
+    val freemiumVm = LocalFreemiumViewModel.current
+    val hasAccess by freemiumVm.hasAccess.collectAsStateWithLifecycle()
 
     LazyColumn(
         modifier = Modifier
@@ -277,7 +283,7 @@ fun HistoryDetailScreen(
                             text  = fmt(entity.totalAmount),
                             style = MaterialTheme.typography.displaySmall,
                             fontWeight = FontWeight.Bold,
-                            color = AccentGreen
+                            color = if (isSystemInDarkTheme()) AccentGreenDark else AccentGreen
                         )
                     }
 
@@ -309,33 +315,62 @@ fun HistoryDetailScreen(
 
         // ── Actions ───────────────────────────────────────────────────────────
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = {
-                        val text = buildDetailShareText(entity, province, isFr, savedItems, fmt, pct)
-                        context.startActivity(
-                            Intent.createChooser(
-                                Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_TEXT, text)
-                                }, null
-                            )
-                        )
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(52.dp)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Share + PDF row (premium gated)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(stringResource(R.string.btn_share))
+                    OutlinedButton(
+                        onClick = {
+                            val doShare = {
+                                val text = buildDetailShareText(entity, province, isFr, savedItems, fmt, pct)
+                                context.startActivity(
+                                    Intent.createChooser(
+                                        Intent(Intent.ACTION_SEND).apply {
+                                            type = "text/plain"
+                                            putExtra(Intent.EXTRA_TEXT, text)
+                                        }, null
+                                    )
+                                )
+                            }
+                            if (!hasAccess) {
+                                freemiumVm.requestAccess(context) { doShare() }
+                            } else {
+                                doShare()
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp)
+                    ) {
+                        Text(
+                            if (hasAccess) stringResource(R.string.btn_share)
+                            else "🔒 ${stringResource(R.string.btn_share)}"
+                        )
+                    }
+                    GradientButton(
+                        text = if (hasAccess) "PDF" else "🔒 PDF",
+                        onClick = {
+                            if (!hasAccess) {
+                                freemiumVm.requestAccess(context) {
+                                    viewModel.exportPdf(context, isFr)
+                                }
+                            } else {
+                                viewModel.exportPdf(context, isFr)
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp)
+                    )
                 }
+                // Delete button
                 OutlinedButton(
                     onClick = { viewModel.delete(onNavigateBack) },
                     modifier = Modifier
-                        .weight(1f)
-                        .height(52.dp),
+                        .fillMaxWidth()
+                        .height(48.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
                     ),

@@ -86,8 +86,8 @@ fun TaxeCATheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            @Suppress("DEPRECATION")
-            window.statusBarColor = CanadaRed.toArgb()
+            // Edge-to-edge: let enableEdgeToEdge() handle system bar colors.
+            // Only set light/dark status bar icons here.
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }

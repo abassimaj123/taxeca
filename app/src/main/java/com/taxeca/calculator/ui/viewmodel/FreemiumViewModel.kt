@@ -58,6 +58,10 @@ class FreemiumViewModel @Inject constructor(
     private val _adUnavailable = MutableStateFlow(false)
     val adUnavailable: StateFlow<Boolean> = _adUnavailable.asStateFlow()
 
+    private val _restoreNoneFound = MutableStateFlow(false)
+    val restoreNoneFound: StateFlow<Boolean> = _restoreNoneFound.asStateFlow()
+    fun clearRestoreNone() { _restoreNoneFound.value = false }
+
     private val _iapError = MutableStateFlow<String?>(null)
     val iapError: StateFlow<String?> = _iapError.asStateFlow()
 
@@ -89,10 +93,8 @@ class FreemiumViewModel @Inject constructor(
         // Observe isPremium changes → update hasAccess + persist to cache
         viewModelScope.launch {
             iapManager.isPremium.collect { premium ->
-                if (premium) {
-                    _hasAccess.value = true
-                    freemiumRepo.setPremiumCached(true) // persist for next launch
-                }
+                _hasAccess.value = premium || _isRewardedActive.value
+                freemiumRepo.setPremiumCached(premium) // persist for next launch (handles refund too)
             }
         }
     }
@@ -276,6 +278,7 @@ class FreemiumViewModel @Inject constructor(
             },
             onNone = {
                 analytics.log("iap_restore_none")
+                _restoreNoneFound.value = true
             }
         )
     }
@@ -289,6 +292,7 @@ class FreemiumViewModel @Inject constructor(
     // ── Interstitial ──────────────────────────────────────────────────────────
 
     fun trackCalculation(context: Context) {
+        reviewManager.trackCalculation() // count usage for review prompt threshold
         val activity = context.findActivity() ?: return
         if (iapManager.isPremium.value || _isRewardedActive.value) return // no ads during premium or rewarded session
         adManager.onCalculation(activity)

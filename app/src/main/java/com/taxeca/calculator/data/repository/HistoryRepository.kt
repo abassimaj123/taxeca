@@ -12,14 +12,16 @@ import javax.inject.Singleton
 class HistoryRepository @Inject constructor(
     private val dao: HistoryDao,
     private val analytics: AnalyticsManager,
-    private val iapManager: IAPManager
+    private val iapManager: IAPManager,
+    private val freemiumRepo: FreemiumRepository
 ) {
     companion object {
         const val FREE_HISTORY_LIMIT = 5
     }
 
     suspend fun save(entity: HistoryEntity) {
-        if (!iapManager.isPremium.value) {
+        val hasFullAccess = iapManager.isPremium.value || freemiumRepo.isRewardedCurrentlyActive()
+        if (!hasFullAccess) {
             while (dao.count() >= FREE_HISTORY_LIMIT) {
                 dao.deleteOldest()
             }

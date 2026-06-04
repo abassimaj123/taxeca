@@ -69,6 +69,13 @@ class FreemiumRepository @Inject constructor(
         return System.currentTimeMillis() - rewardedAt < 60L * 60 * 1000
     }
 
+    /** Synchronous check (reads DataStore cache) for use in HistoryRepository. */
+    suspend fun isRewardedCurrentlyActive(): Boolean {
+        val prefs = dataStore.data.first()
+        val rewardedAt = prefs[KEY_REWARDED_AT] ?: 0L
+        return isRewardedActive(rewardedAt)
+    }
+
     /** Returns true only if the user can watch a rewarded ad right now:
      *  - current session must be EXPIRED (no extending while active)
      *  - daily limit not yet reached

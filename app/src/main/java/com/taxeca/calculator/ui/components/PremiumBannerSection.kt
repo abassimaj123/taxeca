@@ -59,8 +59,6 @@ fun PremiumBannerSection(modifier: Modifier = Modifier) {
             }
         }
 
-        Spacer(Modifier.height(4.dp))
-        AdBanner()
     }
 
     if (showSheet) {

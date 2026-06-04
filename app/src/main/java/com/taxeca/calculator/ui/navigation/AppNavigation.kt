@@ -2,6 +2,7 @@ package com.taxeca.calculator.ui.navigation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,6 +56,7 @@ import androidx.navigation.navArgument
 import com.taxeca.calculator.R
 import com.taxeca.calculator.data.repository.LanguageManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.taxeca.calculator.ui.components.AdBanner
 import com.taxeca.calculator.ui.components.UnlockBottomSheet
 import com.taxeca.calculator.ui.screens.CalculatorScreen
 import com.taxeca.calculator.ui.screens.HistoryDetailScreen
@@ -221,6 +223,8 @@ fun AppNavigation() {
             },
             bottomBar = {
                 if (!isOnSecondary) {
+                    Column {
+                    AdBanner()
                     NavigationBar(tonalElevation = 8.dp) {
                         navItems.forEach { item ->
                             val selected = currentDestination?.hierarchy
@@ -252,6 +256,7 @@ fun AppNavigation() {
                                 }
                             )
                         }
+                    }
                     }
                 }
             }

@@ -23,7 +23,8 @@ fun AdBanner(modifier: Modifier = Modifier) {
     if (!AdConfig.ADS_ENABLED) return
     val freemiumVm = LocalFreemiumViewModel.current
     val isPremium by freemiumVm.isPremium.collectAsStateWithLifecycle()
-    if (isPremium) return
+    val isRewardedActive by freemiumVm.isRewardedActive.collectAsStateWithLifecycle()
+    if (isPremium || isRewardedActive) return
     val screenWidthDp = LocalConfiguration.current.screenWidthDp
     AndroidView(
         factory = { context ->

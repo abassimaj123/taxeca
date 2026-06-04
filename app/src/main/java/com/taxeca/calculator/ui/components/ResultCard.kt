@@ -157,9 +157,7 @@ fun ResultCard(
                         )
                     }
 
-                    // ── Donut chart for tax breakdown ─────────────────────────
-                    Spacer(modifier = Modifier.height(16.dp))
-                    TaxDonutChart(taxResult = taxResult)
+                    // Donut chart removed — not needed for a simple tax calculator
                 }
             }
         }

@@ -58,11 +58,12 @@ fun UnlockBottomSheet(onDismiss: () -> Unit) {
     val timeLeftMs    by freemiumVm.rewardedTimeLeftMs.collectAsStateWithLifecycle()
     val isLoading     by freemiumVm.isLoadingAd.collectAsStateWithLifecycle()
     val canWatch      by freemiumVm.canWatchRewarded.collectAsStateWithLifecycle()
-    val adUnavailable by freemiumVm.adUnavailable.collectAsStateWithLifecycle()
-    val iapError      by freemiumVm.iapError.collectAsStateWithLifecycle()
-    val premiumPrice  by freemiumVm.premiumPrice.collectAsStateWithLifecycle()
-    val context       = LocalContext.current
-    val activity      = context as? Activity
+    val adUnavailable   by freemiumVm.adUnavailable.collectAsStateWithLifecycle()
+    val iapError        by freemiumVm.iapError.collectAsStateWithLifecycle()
+    val restoreNone     by freemiumVm.restoreNoneFound.collectAsStateWithLifecycle()
+    val premiumPrice    by freemiumVm.premiumPrice.collectAsStateWithLifecycle()
+    val context         = LocalContext.current
+    val activity        = context as? Activity
 
     val isHardPaywall by freemiumVm.isHardPaywall.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState()
@@ -78,6 +79,15 @@ fun UnlockBottomSheet(onDismiss: () -> Unit) {
             Toast.makeText(context, context.getString(R.string.unlock_ad_unavailable),
                 Toast.LENGTH_SHORT).show()
             freemiumVm.clearAdUnavailable()
+        }
+    }
+
+    // Show toast on restore — no purchase found
+    LaunchedEffect(restoreNone) {
+        if (restoreNone) {
+            Toast.makeText(context, context.getString(R.string.restore_none_found),
+                Toast.LENGTH_SHORT).show()
+            freemiumVm.clearRestoreNone()
         }
     }
 
@@ -137,7 +147,6 @@ fun UnlockBottomSheet(onDismiss: () -> Unit) {
                 listOf(
                     R.string.benefit_no_ads,
                     R.string.benefit_unlimited_history,
-                    R.string.benefit_all_provinces,
                     R.string.benefit_share_export,
                 ).forEach { resId ->
                     Row(

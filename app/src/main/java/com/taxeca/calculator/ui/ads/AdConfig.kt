@@ -15,7 +15,7 @@ object AdConfig {
     private val isDebug = BuildConfig.DEBUG
 
     /** true = ads actives. En debug, IDs test Google sont utilisés (pas de trafic réel). */
-    val ADS_ENABLED = !isDebug
+    val ADS_ENABLED = true
 
     // ── App ID (also declared in build.gradle.kts as manifestPlaceholder) ─────
     val APP_ID = if (isDebug)

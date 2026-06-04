@@ -65,7 +65,9 @@ import com.taxeca.calculator.ui.components.GradientButton
 import com.taxeca.calculator.ui.components.PillButton
 import com.taxeca.calculator.ui.components.ProvinceSelector
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
+import androidx.compose.foundation.isSystemInDarkTheme
 import com.taxeca.calculator.ui.theme.AccentGreen
+import com.taxeca.calculator.ui.theme.AccentGreenDark
 import com.taxeca.calculator.ui.utils.getDefaultEnterTransition
 import com.taxeca.calculator.ui.utils.getDefaultExitTransition
 import com.taxeca.calculator.ui.viewmodel.RestaurantViewModel
@@ -634,7 +636,7 @@ private fun RestaurantResultCard(result: RestaurantResult) {
                     text  = CurrencyFormatter.formatAmount(result.total),
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Bold,
-                    color = AccentGreen
+                    color = if (isSystemInDarkTheme()) AccentGreenDark else AccentGreen
                 )
             }
 

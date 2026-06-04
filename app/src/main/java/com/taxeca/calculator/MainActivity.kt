@@ -24,8 +24,7 @@ class MainActivity : ComponentActivity() {
         // Apply saved language before Hilt/Compose are available
         val prefs  = newBase.getSharedPreferences(LanguageManager.PREFS_NAME, Context.MODE_PRIVATE)
         val lang   = prefs.getString(LanguageManager.KEY_LANG, null)
-            ?: Locale.getDefault().language.takeIf { it == LanguageManager.LANG_FR }
-            ?: LanguageManager.LANG_EN
+            ?: if (Locale.getDefault().language == "fr") LanguageManager.LANG_FR else LanguageManager.LANG_EN
         val locale = Locale.forLanguageTag(lang)
         Locale.setDefault(locale)
         val config = Configuration(newBase.resources.configuration)

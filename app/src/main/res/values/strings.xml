@@ -186,9 +186,9 @@
     <!-- Premium benefits list -->
     <string name="benefit_no_ads">No ads, ever</string>
     <string name="benefit_unlimited_history">Unlimited calculation history</string>
-    <string name="benefit_all_provinces">All 13 provinces &amp; territories</string>
     <string name="benefit_share_export">Share &amp; export results (PDF)</string>
     <string name="iap_error_generic">Purchase failed. Please try again.</string>
+    <string name="restore_none_found">No previous purchase found.</string>
     <string name="content_desc_locked">Locked</string>
     <string name="content_desc_unlocked">Unlocked</string>
 

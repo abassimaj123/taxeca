@@ -51,7 +51,9 @@ import com.taxeca.calculator.R
 import com.taxeca.calculator.data.model.HistoryEntity
 import com.taxeca.calculator.ui.components.PremiumBannerSection
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
+import androidx.compose.foundation.isSystemInDarkTheme
 import com.taxeca.calculator.ui.theme.AccentGreen
+import com.taxeca.calculator.ui.theme.AccentGreenDark
 import com.taxeca.calculator.ui.viewmodel.HistoryViewModel
 import com.taxeca.calculator.utils.CurrencyFormatter
 import java.text.SimpleDateFormat
@@ -344,7 +346,7 @@ private fun HistoryCompactCard(
                         text = stringResource(R.string.history_card_total, CurrencyFormatter.formatAmount(entity.totalAmount)),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = AccentGreen
+                        color = if (isSystemInDarkTheme()) AccentGreenDark else AccentGreen
                     )
                     IconButton(
                         onClick = onDelete,

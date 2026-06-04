@@ -184,9 +184,9 @@
     <!-- Premium benefits list -->
     <string name="benefit_no_ads">Aucune publicité</string>
     <string name="benefit_unlimited_history">Historique illimité</string>
-    <string name="benefit_all_provinces">Les 13 provinces et territoires</string>
     <string name="benefit_share_export">Partage et export PDF des résultats</string>
     <string name="iap_error_generic">Achat échoué. Veuillez réessayer.</string>
+    <string name="restore_none_found">Aucun achat précédent trouvé.</string>
     <string name="content_desc_locked">Verrouillé</string>
     <string name="content_desc_unlocked">Déverrouillé</string>
 

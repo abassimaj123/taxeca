@@ -263,7 +263,8 @@ class FreemiumViewModel @Inject constructor(
             },
             onError = { reason ->
                 if (reason != "cancelled") {
-                    analytics.log("iap_purchase_error")
+                    analytics.logPurchaseError(reason)
+                    analytics.recordException(RuntimeException("IAP failed: $reason"))
                     _iapError.value = reason
                 }
             }

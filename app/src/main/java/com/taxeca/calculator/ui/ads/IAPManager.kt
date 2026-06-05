@@ -125,6 +125,17 @@ class IAPManager @Inject constructor(
         _onPurchaseError = onError
 
         scope.launch {
+            // Ensure BillingClient is connected before attempting purchase
+            if (!billingClient.isReady) {
+                Log.w(TAG, "BillingClient not ready — reconnecting…")
+                val connected = suspendConnect()
+                if (!connected) {
+                    Log.e(TAG, "BillingClient reconnect failed")
+                    onError("Billing service unavailable")
+                    return@launch
+                }
+            }
+
             val productList = listOf(
                 QueryProductDetailsParams.Product.newBuilder()
                     .setProductId(PRODUCT_ID)
@@ -135,11 +146,17 @@ class IAPManager @Inject constructor(
                 .setProductList(productList)
                 .build()
             val detailsResult = billingClient.queryProductDetails(params)
+            Log.d(TAG, "queryProductDetails responseCode=${detailsResult.billingResult.responseCode}, " +
+                    "debugMessage=${detailsResult.billingResult.debugMessage}, " +
+                    "products=${detailsResult.productDetailsList?.size ?: 0}")
             val productDetails = detailsResult.productDetailsList?.firstOrNull()
             if (productDetails == null) {
+                Log.e(TAG, "Product '$PRODUCT_ID' not found — check Play Console product status")
                 onError("Product not found")
                 return@launch
             }
+            Log.d(TAG, "Launching billing flow for: ${productDetails.productId}, " +
+                    "price=${productDetails.oneTimePurchaseOfferDetails?.formattedPrice}")
             val billingFlowParams = BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(
                     listOf(
@@ -151,8 +168,28 @@ class IAPManager @Inject constructor(
                 .build()
             // Must launch on main thread
             scope.launch(Dispatchers.Main) {
-                billingClient.launchBillingFlow(activity, billingFlowParams)
+                val result = billingClient.launchBillingFlow(activity, billingFlowParams)
+                Log.d(TAG, "launchBillingFlow responseCode=${result.responseCode}, " +
+                        "debugMessage=${result.debugMessage}")
             }
+        }
+    }
+
+    /** Suspending connect helper — returns true if connected successfully. */
+    private suspend fun suspendConnect(): Boolean {
+        return kotlinx.coroutines.suspendCancellableCoroutine { cont ->
+            billingClient.startConnection(object : BillingClientStateListener {
+                override fun onBillingSetupFinished(result: BillingResult) {
+                    if (cont.isActive) {
+                        cont.resume(result.responseCode == BillingClient.BillingResponseCode.OK) {}
+                    }
+                }
+                override fun onBillingServiceDisconnected() {
+                    if (cont.isActive) {
+                        cont.resume(false) {}
+                    }
+                }
+            })
         }
     }
 

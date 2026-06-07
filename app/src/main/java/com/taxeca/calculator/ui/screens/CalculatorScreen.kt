@@ -97,6 +97,8 @@ fun CalculatorScreen(
     val hasResult = taxResult != null && isInputValid
     val snackbarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(Unit) { viewModel.logScreenView() }
+
     // Show snackbar when calculation is saved
     LaunchedEffect(saveConfirmed) {
         if (saveConfirmed) {

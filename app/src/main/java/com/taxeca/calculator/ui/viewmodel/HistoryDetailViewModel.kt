@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.taxeca.calculator.data.model.HistoryEntity
 import com.taxeca.calculator.data.repository.HistoryRepository
 import com.taxeca.calculator.ui.ads.PdfExportService
+import com.taxeca.calculator.ui.analytics.AnalyticsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,8 +19,11 @@ import javax.inject.Inject
 class HistoryDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: HistoryRepository,
-    private val pdfExportService: PdfExportService
+    private val pdfExportService: PdfExportService,
+    private val analytics: AnalyticsManager
 ) : ViewModel() {
+
+    fun logScreenView() = analytics.logScreenView("HistoryDetail")
 
     private val entryId: Long = checkNotNull(savedStateHandle["entryId"])
 

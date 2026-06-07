@@ -140,6 +140,8 @@ class RestaurantViewModel @Inject constructor(
         scheduleCalculation()
     }
 
+    fun logScreenView() = analytics.logScreenView("Restaurant")
+
     // ── Province ──────────────────────────────────────────────────────────────
     fun onProvinceChange(province: Province) {
         _selectedProvince.value = province

@@ -35,8 +35,11 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.taxeca.calculator.ui.viewmodel.SettingsViewModel
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -50,12 +53,17 @@ import com.taxeca.calculator.data.repository.LanguageManager
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
 
 @Composable
-fun SettingsScreen(languageManager: LanguageManager) {
+fun SettingsScreen(
+    languageManager: LanguageManager,
+    viewModel: SettingsViewModel = hiltViewModel()
+) {
     val freemiumVm = LocalFreemiumViewModel.current
     val isPremium  by freemiumVm.isPremium.collectAsStateWithLifecycle()
     val isFrench   by languageManager.isFrench.collectAsStateWithLifecycle()
     val context    = LocalContext.current
     val activity   = context as? android.app.Activity
+
+    LaunchedEffect(Unit) { viewModel.logScreenView() }
 
     Box(
         modifier = Modifier.fillMaxSize(),

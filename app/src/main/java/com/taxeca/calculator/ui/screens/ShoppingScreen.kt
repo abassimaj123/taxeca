@@ -90,6 +90,8 @@ fun ShoppingScreen(
 
     val hasResult = listResult != null
 
+    LaunchedEffect(Unit) { viewModel.logScreenView() }
+
     // recordAction() called on Save button and tab navigation (not on every auto-recalculate)
 
     val priceFocus = remember { FocusRequester() }

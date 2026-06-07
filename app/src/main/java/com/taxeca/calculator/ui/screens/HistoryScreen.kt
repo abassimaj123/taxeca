@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,6 +72,8 @@ fun HistoryScreen(
     val isPremium        by freemiumVm.isPremium.collectAsStateWithLifecycle()
     val isRewardedActive by freemiumVm.isRewardedActive.collectAsStateWithLifecycle()
     val hasFullAccess    = isPremium || isRewardedActive
+
+    LaunchedEffect(Unit) { viewModel.logScreenView() }
 
     // ── Confirmation dialogs state ────────────────────────────────────────────
     var pendingDeleteId      by remember { mutableStateOf<Long?>(null) }

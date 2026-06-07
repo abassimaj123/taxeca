@@ -122,6 +122,8 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
+    fun logScreenView() = analytics.logScreenView("Calculator")
+
     fun onAmountChange(value: String) {
         val filtered = value.replace(',', '.').filter { it.isDigit() || it == '.' }
         if (filtered.count { it == '.' } <= 1) {

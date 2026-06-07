@@ -101,6 +101,8 @@ class ShoppingViewModel @Inject constructor(
         }
     }
 
+    fun logScreenView() = analytics.logScreenView("Shopping")
+
     fun logShare() = analytics.log("shopping_list_shared", "nb_articles" to _items.value.size)
 
     fun resetDisplay() {

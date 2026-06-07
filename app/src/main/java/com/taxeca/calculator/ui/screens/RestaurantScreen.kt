@@ -102,6 +102,8 @@ fun RestaurantScreen(
     val hasResult    = result != null && isInputValid
     val itemPriceFocus = remember { FocusRequester() }
 
+    LaunchedEffect(Unit) { viewModel.logScreenView() }
+
     // recordAction() called on Save button and tab navigation (not on every auto-recalculate)
 
     val fmt: (Double) -> String = { CurrencyFormatter.formatAmount(it) }

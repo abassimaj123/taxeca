@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.taxeca.calculator.data.model.HistoryEntity
 import com.taxeca.calculator.data.repository.HistoryRepository
 import com.taxeca.calculator.domain.usecase.GetHistoryUseCase
+import com.taxeca.calculator.ui.analytics.AnalyticsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -15,8 +16,11 @@ import javax.inject.Inject
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     getHistory: GetHistoryUseCase,
-    private val historyRepo: HistoryRepository
+    private val historyRepo: HistoryRepository,
+    private val analytics: AnalyticsManager
 ) : ViewModel() {
+
+    fun logScreenView() = analytics.logScreenView("History")
 
     val history: StateFlow<List<HistoryEntity>> = getHistory()
         .stateIn(

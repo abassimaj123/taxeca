@@ -37,6 +37,13 @@ class AnalyticsManager @Inject constructor(
 
     // ── Named funnel events ───────────────────────────────────────────────────
 
+    fun logScreenView(screenName: String) {
+        val bundle = Bundle()
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, screenName)
+        bundle.putString("app_name", "TaxeCA")
+        fa.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
+    }
+
     fun logAppOpen()           = log("app_open")
     fun logPaywallShown(type: String) = log("paywall_shown", "type" to type)
     fun logPaywallDismissed()  = log("paywall_dismissed")

@@ -82,7 +82,7 @@ class IAPManager @Inject constructor(
         }
     }
 
-    private suspend fun queryProductPrice() {
+    private suspend fun queryProductPrice(attempt: Int = 1) {
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(listOf(
                 QueryProductDetailsParams.Product.newBuilder()
@@ -91,12 +91,26 @@ class IAPManager @Inject constructor(
                     .build()
             ))
             .build()
-        val result = billingClient.queryProductDetails(params)
-        result.productDetailsList
-            ?.firstOrNull()
-            ?.oneTimePurchaseOfferDetails
-            ?.formattedPrice
-            ?.let { _premiumPrice.value = it }
+        try {
+            val result = billingClient.queryProductDetails(params)
+            val price = result.productDetailsList
+                ?.firstOrNull()
+                ?.oneTimePurchaseOfferDetails
+                ?.formattedPrice
+            if (price != null) {
+                _premiumPrice.value = price
+                return  // ✅ success
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Price fetch error (attempt $attempt): ${e.message}")
+        }
+        // Retry with backoff: 5s → 20s → 45s (max 3 attempts)
+        if (attempt < 3) {
+            val delayMs = 5000L * attempt * attempt
+            Log.d(TAG, "Retrying price fetch in ${delayMs / 1000}s…")
+            kotlinx.coroutines.delay(delayMs)
+            queryProductPrice(attempt + 1)
+        }
     }
 
     private suspend fun queryExistingPurchases() {

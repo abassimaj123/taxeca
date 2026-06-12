@@ -142,6 +142,10 @@ class IAPManager @Inject constructor(
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
+        // Already owned locally — don't open a flow that would just return
+        // ITEM_ALREADY_OWNED; grant immediately.
+        if (_isPremium.value) { onSuccess(); return }
+
         _onPurchaseSuccess = onSuccess
         _onPurchaseError = onError
 
@@ -192,8 +196,35 @@ class IAPManager @Inject constructor(
                 val result = billingClient.launchBillingFlow(activity, billingFlowParams)
                 Log.d(TAG, "launchBillingFlow responseCode=${result.responseCode}, " +
                         "debugMessage=${result.debugMessage}")
+                // If the flow did NOT open (responseCode != OK), onPurchasesUpdated will
+                // never fire — resolve the pending callbacks here or the UI hangs forever.
+                if (result.responseCode != BillingClient.BillingResponseCode.OK) {
+                    when (result.responseCode) {
+                        BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED ->
+                            unlockAlreadyOwned()
+                        BillingClient.BillingResponseCode.USER_CANCELED -> {
+                            _onPurchaseError?.invoke("cancelled"); clearCallbacks()
+                        }
+                        else -> {
+                            _onPurchaseError?.invoke(result.debugMessage); clearCallbacks()
+                        }
+                    }
+                }
             }
         }
+    }
+
+    /** Marks premium, syncs/acknowledges in the background, and fires the success callback. */
+    private fun unlockAlreadyOwned() {
+        _isPremium.value = true
+        scope.launch { queryExistingPurchases() } // pulls the token + acknowledges if needed
+        _onPurchaseSuccess?.invoke()
+        clearCallbacks()
+    }
+
+    private fun clearCallbacks() {
+        _onPurchaseSuccess = null
+        _onPurchaseError = null
     }
 
     /** Suspending connect helper — returns true if connected successfully. */
@@ -201,9 +232,11 @@ class IAPManager @Inject constructor(
         return kotlinx.coroutines.suspendCancellableCoroutine { cont ->
             billingClient.startConnection(object : BillingClientStateListener {
                 override fun onBillingSetupFinished(result: BillingResult) {
-                    if (cont.isActive) {
-                        cont.resume(result.responseCode == BillingClient.BillingResponseCode.OK) {}
-                    }
+                    val ok = result.responseCode == BillingClient.BillingResponseCode.OK
+                    // Reset the background-reconnect budget so a transient 5-disconnect
+                    // burst doesn't permanently disable auto price/purchase refresh.
+                    if (ok) reconnectAttempts = 0
+                    if (cont.isActive) cont.resume(ok) {}
                 }
                 override fun onBillingServiceDisconnected() {
                     if (cont.isActive) {
@@ -228,12 +261,19 @@ class IAPManager @Inject constructor(
         }
     }
 
-    private fun acknowledgePurchase(purchase: Purchase) {
+    private fun acknowledgePurchase(purchase: Purchase, attempt: Int = 1) {
         val params = AcknowledgePurchaseParams.newBuilder()
             .setPurchaseToken(purchase.purchaseToken)
             .build()
         scope.launch {
-            billingClient.acknowledgePurchase(params)
+            val result = billingClient.acknowledgePurchase(params)
+            // An unacknowledged purchase is auto-refunded by Google after 3 days.
+            // Retry transient failures instead of relying solely on the next-launch sweep.
+            if (result.responseCode != BillingClient.BillingResponseCode.OK && attempt < 4) {
+                Log.w(TAG, "Acknowledge failed (attempt $attempt): ${result.debugMessage} — retrying")
+                kotlinx.coroutines.delay(2000L * attempt)
+                acknowledgePurchase(purchase, attempt + 1)
+            }
         }
     }
 
@@ -247,8 +287,7 @@ class IAPManager @Inject constructor(
                             _isPremium.value = true
                             if (!purchase.isAcknowledged) acknowledgePurchase(purchase)
                             _onPurchaseSuccess?.invoke()
-                            _onPurchaseSuccess = null
-                            _onPurchaseError = null
+                            clearCallbacks()
                         }
                         Purchase.PurchaseState.PENDING -> {
                             // Payment deferred (cash, parental approval). Don't leave the UI
@@ -256,22 +295,27 @@ class IAPManager @Inject constructor(
                             // queryExistingPurchases once it clears to PURCHASED.
                             Log.d(TAG, "Purchase pending — awaiting completion")
                             _onPurchaseError?.invoke("pending")
-                            _onPurchaseError = null
-                            _onPurchaseSuccess = null
+                            clearCallbacks()
                         }
                         else -> { /* UNSPECIFIED — no action */ }
                     }
                 }
             }
+            BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
+                // User already owns premium (other device, or local state lost).
+                // This is NOT an error — sync entitlement and grant access.
+                Log.d(TAG, "Item already owned — syncing entitlement")
+                unlockAlreadyOwned()
+            }
             BillingClient.BillingResponseCode.USER_CANCELED -> {
                 Log.d(TAG, "User cancelled purchase")
                 _onPurchaseError?.invoke("cancelled")
-                _onPurchaseError = null
+                clearCallbacks()
             }
             else -> {
                 Log.d(TAG, "Purchase error: ${result.debugMessage}")
                 _onPurchaseError?.invoke(result.debugMessage)
-                _onPurchaseError = null
+                clearCallbacks()
             }
         }
     }

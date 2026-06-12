@@ -101,6 +101,8 @@
     <string name="shopping_item_name_optional">Nom (facultatif)</string>
     <string name="shopping_item_price">Prix</string>
     <string name="shopping_items_count">%1$d article(s)</string>
+    <string name="shopping_tax_exempt">Détaxé</string>
+    <string name="shopping_toggle_taxable">Basculer détaxé (aliments de base)</string>
     <string name="shopping_summary">Résumé</string>
     <string name="shopping_grand_total">Total général</string>
     <string name="shopping_clear_title">Effacer la liste ?</string>
@@ -186,6 +188,7 @@
     <string name="benefit_unlimited_history">Historique illimité</string>
     <string name="benefit_share_export">Partage et export PDF des résultats</string>
     <string name="iap_error_generic">Achat échoué. Veuillez réessayer.</string>
+    <string name="iap_pending">Paiement en attente. Premium s\'activera une fois complété.</string>
     <string name="restore_none_found">Aucun achat précédent trouvé.</string>
     <string name="content_desc_locked">Verrouillé</string>
     <string name="content_desc_unlocked">Déverrouillé</string>

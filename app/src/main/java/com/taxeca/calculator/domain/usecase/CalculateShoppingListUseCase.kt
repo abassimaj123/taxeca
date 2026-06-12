@@ -31,6 +31,18 @@ class CalculateShoppingListUseCase @Inject constructor() {
     }
 
     private fun calculateItem(item: ShoppingItem, province: Province): ShoppingItemResult {
+        // Tax-exempt item (basic groceries are zero-rated for GST/HST, and exempt from
+        // most PST/QST on food): charge no tax, total = price.
+        if (!item.taxable) {
+            return ShoppingItemResult(
+                item       = item,
+                gstAmount  = 0.0,
+                pstAmount  = 0.0,
+                hstAmount  = 0.0,
+                totalTax   = 0.0,
+                totalPrice = item.price
+            )
+        }
         return if (province.isHstProvince) {
             val hst = item.price * province.hstRate
             ShoppingItemResult(

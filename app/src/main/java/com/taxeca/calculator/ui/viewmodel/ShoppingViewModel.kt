@@ -86,6 +86,13 @@ class ShoppingViewModel @Inject constructor(
         _items.value = _items.value.filterNot { it.id == id }
     }
 
+    /** Toggle an item between taxable and tax-exempt (basic groceries). */
+    fun toggleTaxable(id: String) {
+        _items.value = _items.value.map {
+            if (it.id == id) it.copy(taxable = !it.taxable) else it
+        }
+    }
+
     // ── Save + feedback ───────────────────────────────────────────────────────
     private val _saveConfirmed = MutableStateFlow(false)
     val saveConfirmed: StateFlow<Boolean> = _saveConfirmed.asStateFlow()

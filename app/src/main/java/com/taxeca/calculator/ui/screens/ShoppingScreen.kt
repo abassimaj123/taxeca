@@ -27,6 +27,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.MoneyOff
+import androidx.compose.material.icons.outlined.Sell
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -247,8 +249,9 @@ fun ShoppingScreen(
         // ── Each item row — swipe left to delete ──────────────────────────────
         items(items = items, key = { it.id }) { item ->
             SwipeToDeleteItem(
-                item     = item,
-                onDelete = { viewModel.removeItem(item.id) },
+                item            = item,
+                onDelete        = { viewModel.removeItem(item.id) },
+                onToggleTaxable = { viewModel.toggleTaxable(item.id) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .animateItem()
@@ -329,6 +332,7 @@ fun ShoppingScreen(
 private fun SwipeToDeleteItem(
     item: ShoppingItem,
     onDelete: () -> Unit,
+    onToggleTaxable: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dismissState = rememberSwipeToDismissBoxState(
@@ -347,7 +351,7 @@ private fun SwipeToDeleteItem(
         backgroundContent        = { DeleteBackground() },
         modifier                 = modifier
     ) {
-        ItemRow(item = item, onDelete = onDelete)
+        ItemRow(item = item, onDelete = onDelete, onToggleTaxable = onToggleTaxable)
     }
 }
 
@@ -373,7 +377,7 @@ private fun DeleteBackground() {
 }
 
 @Composable
-private fun ItemRow(item: ShoppingItem, onDelete: () -> Unit) {
+private fun ItemRow(item: ShoppingItem, onDelete: () -> Unit, onToggleTaxable: () -> Unit) {
     Surface(
         shape          = MaterialTheme.shapes.medium,
         tonalElevation = 3.dp,
@@ -386,11 +390,20 @@ private fun ItemRow(item: ShoppingItem, onDelete: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment     = Alignment.CenterVertically
         ) {
-            Text(
-                text     = item.displayName,
-                style    = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(1f)
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text  = item.displayName,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                if (!item.taxable) {
+                    Text(
+                        text  = stringResource(R.string.shopping_tax_exempt),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = AccentGreen,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
             Spacer(Modifier.width(8.dp))
             Text(
                 text       = CurrencyFormatter.formatAmount(item.price),
@@ -398,6 +411,20 @@ private fun ItemRow(item: ShoppingItem, onDelete: () -> Unit) {
                 fontWeight = FontWeight.SemiBold,
                 color      = MaterialTheme.colorScheme.primary
             )
+            // Tax-exempt toggle (basic groceries are zero-rated in Canada)
+            IconButton(
+                onClick  = onToggleTaxable,
+                modifier = Modifier.size(36.dp).padding(start = 4.dp)
+            ) {
+                Icon(
+                    imageVector        = if (item.taxable) Icons.Outlined.Sell
+                                         else Icons.Filled.MoneyOff,
+                    contentDescription = stringResource(R.string.shopping_toggle_taxable),
+                    tint               = if (item.taxable) MaterialTheme.colorScheme.onSurfaceVariant
+                                         else AccentGreen,
+                    modifier           = Modifier.size(18.dp)
+                )
+            }
             IconButton(
                 onClick  = onDelete,
                 modifier = Modifier.size(36.dp).padding(start = 4.dp)

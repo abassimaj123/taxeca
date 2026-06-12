@@ -123,7 +123,14 @@ class IAPManager @Inject constructor(
                 purchase.products.contains(PRODUCT_ID) &&
                 purchase.purchaseState == Purchase.PurchaseState.PURCHASED
             }
-            _isPremium.value = hasPremium
+            // LATCH-UP: only ever promote to premium here, never downgrade.
+            // A routine reconnect query can return OK + empty list from a cold/offline
+            // Play Store cache for a user who genuinely owns premium. Writing `false`
+            // would persist a bad downgrade (FreemiumViewModel caches every emission) and
+            // irreversibly trim a paying user's history (HistoryRepository). Refund
+            // revocation is handled server-side: a refunded user simply won't re-promote
+            // on a fresh install. See audit 2026-06-12.
+            if (hasPremium) _isPremium.value = true
             result.purchasesList
                 .filter { it.purchaseState == Purchase.PurchaseState.PURCHASED && !it.isAcknowledged }
                 .forEach { acknowledgePurchase(it) }
@@ -209,6 +216,13 @@ class IAPManager @Inject constructor(
 
     fun restorePurchases(onSuccess: () -> Unit, onNone: () -> Unit) {
         scope.launch {
+            // Reconnect if the client dropped (e.g. after maxReconnectAttempts was hit),
+            // otherwise queryPurchasesAsync returns a non-OK code and a real owner is
+            // wrongly told "no purchase found".
+            if (!billingClient.isReady) {
+                val connected = suspendConnect()
+                if (!connected) { onNone(); return@launch }
+            }
             queryExistingPurchases()
             if (_isPremium.value) onSuccess() else onNone()
         }
@@ -227,12 +241,25 @@ class IAPManager @Inject constructor(
         when (result.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
                 purchases?.forEach { purchase ->
-                    if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED &&
-                        purchase.products.contains(PRODUCT_ID)) {
-                        _isPremium.value = true
-                        if (!purchase.isAcknowledged) acknowledgePurchase(purchase)
-                        _onPurchaseSuccess?.invoke()
-                        _onPurchaseSuccess = null
+                    if (!purchase.products.contains(PRODUCT_ID)) return@forEach
+                    when (purchase.purchaseState) {
+                        Purchase.PurchaseState.PURCHASED -> {
+                            _isPremium.value = true
+                            if (!purchase.isAcknowledged) acknowledgePurchase(purchase)
+                            _onPurchaseSuccess?.invoke()
+                            _onPurchaseSuccess = null
+                            _onPurchaseError = null
+                        }
+                        Purchase.PurchaseState.PENDING -> {
+                            // Payment deferred (cash, parental approval). Don't leave the UI
+                            // spinning — inform the user; entitlement is granted later via
+                            // queryExistingPurchases once it clears to PURCHASED.
+                            Log.d(TAG, "Purchase pending — awaiting completion")
+                            _onPurchaseError?.invoke("pending")
+                            _onPurchaseError = null
+                            _onPurchaseSuccess = null
+                        }
+                        else -> { /* UNSPECIFIED — no action */ }
                     }
                 }
             }

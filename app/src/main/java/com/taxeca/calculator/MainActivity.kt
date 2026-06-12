@@ -7,8 +7,12 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.ump.ConsentRequestParameters
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import com.google.android.ump.UserMessagingPlatform
 import com.taxeca.calculator.data.repository.LanguageManager
 import com.taxeca.calculator.ui.ads.AdConfig
@@ -71,8 +75,27 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun initializeAds() {
-        if (AdConfig.ADS_ENABLED) {
-            MobileAds.initialize(this) {}
+        if (!AdConfig.ADS_ENABLED) return
+        // Register QA/dev devices so real-ad impressions during internal release
+        // testing aren't counted as invalid clicks (AdMob account-safety).
+        // The hash is NOT the adb serial — copy it from logcat on first ad load:
+        //   "Use RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList(\"<HASH>\"))"
+        // then paste it into TEST_DEVICE_IDS for release QA builds.
+        if (TEST_DEVICE_IDS.isNotEmpty()) {
+            MobileAds.setRequestConfiguration(
+                RequestConfiguration.Builder().setTestDeviceIds(TEST_DEVICE_IDS).build()
+            )
         }
+        // initialize() does disk/network I/O on first run — keep it off the UI thread
+        // to avoid startup jank.
+        lifecycleScope.launch(Dispatchers.IO) {
+            MobileAds.initialize(this@MainActivity) {}
+        }
+    }
+
+    private companion object {
+        // Paste AdMob test-device hashes (from logcat) for release QA. Empty = none.
+        // Debug builds already use Google test ad-unit IDs, so no real impressions there.
+        val TEST_DEVICE_IDS = emptyList<String>()
     }
 }

@@ -94,7 +94,9 @@ class FreemiumViewModel @Inject constructor(
         viewModelScope.launch {
             iapManager.isPremium.collect { premium ->
                 _hasAccess.value = premium || _isRewardedActive.value
-                freemiumRepo.setPremiumCached(premium) // persist for next launch (handles refund too)
+                // isPremium is latched (never downgraded by a transient empty query),
+                // so this only ever caches a confirmed-true. Safe across launches.
+                freemiumRepo.setPremiumCached(premium)
             }
         }
     }
@@ -262,10 +264,18 @@ class FreemiumViewModel @Inject constructor(
                 reviewManager.maybeRequestReview(activity)
             },
             onError = { reason ->
-                if (reason != "cancelled") {
-                    analytics.logPurchaseError(reason)
-                    analytics.recordException(RuntimeException("IAP failed: $reason"))
-                    _iapError.value = reason
+                when (reason) {
+                    "cancelled" -> { /* user backed out — silent */ }
+                    "pending"   -> {
+                        // Deferred payment, not a failure — surface info, don't log as crash.
+                        analytics.log("iap_purchase_pending")
+                        _iapError.value = "pending"
+                    }
+                    else -> {
+                        analytics.logPurchaseError(reason)
+                        analytics.recordException(RuntimeException("IAP failed: $reason"))
+                        _iapError.value = reason
+                    }
                 }
             }
         )

@@ -103,6 +103,8 @@
     <string name="shopping_item_name_optional">Name (optional)</string>
     <string name="shopping_item_price">Price</string>
     <string name="shopping_items_count">%1$d item(s)</string>
+    <string name="shopping_tax_exempt">Tax-exempt</string>
+    <string name="shopping_toggle_taxable">Toggle tax-exempt (basic groceries)</string>
     <string name="shopping_summary">Summary</string>
     <string name="shopping_grand_total">Grand Total</string>
     <string name="shopping_clear_title">Clear list?</string>
@@ -188,6 +190,7 @@
     <string name="benefit_unlimited_history">Unlimited calculation history</string>
     <string name="benefit_share_export">Share &amp; export results (PDF)</string>
     <string name="iap_error_generic">Purchase failed. Please try again.</string>
+    <string name="iap_pending">Payment pending. Premium unlocks once it completes.</string>
     <string name="restore_none_found">No previous purchase found.</string>
     <string name="content_desc_locked">Locked</string>
     <string name="content_desc_unlocked">Unlocked</string>

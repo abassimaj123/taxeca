@@ -91,11 +91,12 @@ fun UnlockBottomSheet(onDismiss: () -> Unit) {
         }
     }
 
-    // Show toast on IAP error
+    // Show toast on IAP error (pending = deferred payment, distinct message)
     LaunchedEffect(iapError) {
-        iapError?.let {
-            Toast.makeText(context, context.getString(R.string.iap_error_generic),
-                Toast.LENGTH_SHORT).show()
+        iapError?.let { reason ->
+            val msgRes = if (reason == "pending") R.string.iap_pending
+                         else R.string.iap_error_generic
+            Toast.makeText(context, context.getString(msgRes), Toast.LENGTH_SHORT).show()
             freemiumVm.clearIapError()
         }
     }

@@ -45,6 +45,10 @@ class HistoryDetailViewModel @Inject constructor(
 
     fun exportPdf(context: Context, isFrench: Boolean) {
         val entity = _entry.value ?: return
-        pdfExportService.exportAndShare(entity, isFrench)
+        viewModelScope.launch {
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                pdfExportService.exportAndShare(entity, isFrench)
+            }
+        }
     }
 }

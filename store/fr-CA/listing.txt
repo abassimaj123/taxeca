@@ -2,20 +2,28 @@ App: Calculateur de taxes Canada — TaxeCA
 Langues: Français, Anglais
 
 Description courte:
-Calculez vos impôts fédéraux et provinciaux canadiens instantanément — toutes les provinces, 2024.
+Calculateur de taxes de vente pour toutes les provinces — TPS/TVH/TVQ/TPV 2026.
 
 Description complète:
-TaxeCA vous aide à estimer votre impôt fédéral et provincial au Canada rapidement et avec précision.
+TaxeCA est le calculateur de taxes de vente canadiennes le plus rapide et le plus précis — couvrant toutes les provinces et tous les territoires avec des taux à jour pour 2026.
 
-Fonctionnalités:
-- Calcul de l'impôt fédéral canadien (tranches 2024)
-- Impôt provincial pour toutes les provinces et territoires
-- Cotisations au RPC et à l'AE
-- Taux effectif et taux marginal d'imposition
-- Décomposition des tranches d'imposition
-- Estimateur de revenu net après impôts
+Que vous fassiez des achats, dîniez au restaurant ou partagiez une addition, TaxeCA vous donne le détail exact en quelques secondes.
 
-Confidentialité / LPRPDE:
-Aucune donnée personnelle n'est vendue ou partagée. Contact: abassimaj@gmail.com
+Fonctionnalités :
+- Calcul de la TPS/TVH/TPV pour les 13 provinces et territoires
+- Taux exacts TPS/TVQ pour le Québec (5 % + 9,975 %)
+- Mode Pourboire : calculez le pourboire en pourcentage ou en montant fixe
+- Mode Restaurant : taxes + pourboire + partage de l'addition par personne
+- Calcul inversé : trouvez le montant avant taxes à partir du total payé
+- Mode Liste d'achats : taxez plusieurs articles en même temps
+- Historique des calculs avec export en PDF
+- Entièrement bilingue : français et anglais
+- Taux 2026 toujours à jour
 
-Contact: abassimaj@gmail.com
+Provinces et territoires pris en charge :
+AB · BC · MB · NB · NL · NS · NT · NU · ON · PE · QC · SK · YT
+
+Confidentialité / LPRPDE :
+Aucune donnée personnelle n'est vendue ou partagée. Contact : abassimaj@gmail.com
+
+Contact : abassimaj@gmail.com

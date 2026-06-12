@@ -225,6 +225,11 @@ class CalculatorViewModel @Inject constructor(
                     CalculationMode.FORWARD -> calculateTax(input, province)
                     CalculationMode.REVERSE -> reverseCalculateTax(input, province)
                 }
+                // Log first_calculate once per install
+                if (!settingsRepo.isFirstCalcDone()) {
+                    analytics.log("first_calculate", "province" to province.code, "mode" to _mode.value.name)
+                    settingsRepo.markFirstCalcDone()
+                }
             } catch (e: Exception) {
                 analytics.recordException(e)
             }

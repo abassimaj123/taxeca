@@ -1,19 +1,27 @@
-App: Canada Tax Calculator — TaxeCA
+App: Canada Sales Tax Calculator — TaxeCA
 Languages: English, French
 
 Short Description:
-Calculate your Canadian federal and provincial income tax instantly — all provinces, 2024 brackets.
+Sales tax calculator for all Canadian provinces — GST/HST/PST/TVQ 2026.
 
 Full Description:
-TaxeCA helps individuals estimate their federal and provincial income taxes in Canada quickly and accurately.
+TaxeCA is the fastest and most accurate Canadian sales tax calculator — covering every province and territory with up-to-date 2026 rates.
+
+Whether you are shopping, dining out, or splitting a restaurant bill, TaxeCA gives you the exact breakdown in seconds.
 
 Features:
-- Federal income tax calculation (2024 brackets)
-- Provincial tax for all provinces and territories
-- CPP and EI contributions
-- Effective tax rate and marginal rate display
-- Tax bracket breakdown
-- Net income estimator after all taxes
+- GST/HST/PST calculation for all 13 provinces and territories
+- Quebec TPS/TVQ exact rates (5% + 9.975%)
+- Tip mode: calculate gratuity as a percentage or fixed amount
+- Restaurant mode: tax + tip + bill splitting per person
+- Reverse calculation: find the pre-tax amount from a total paid
+- Shopping list mode: tax multiple items at once
+- Calculation history with export to PDF
+- Full bilingual support: English and French
+- 2026 rates always up to date
+
+Supported provinces and territories:
+AB · BC · MB · NB · NL · NS · NT · NU · ON · PE · QC · SK · YT
 
 Privacy / PIPEDA:
 No personal data is sold or shared. Contact: abassimaj@gmail.com

@@ -10,23 +10,41 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.taxeca.calculator.data.repository.AdRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AdManager @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val adRepo: AdRepository
 ) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     private var interstitialAd: InterstitialAd? = null
     private var isLoadingInterstitial = false
 
     // ── Interstitial frequency gate ──────────────────────────────────────────
-    private var calcCount            = 0
-    private var lastInterstitialTime = 0L
+    // In-memory for fast gate checks; seeded from DataStore on init so counter
+    // survives app restarts (users can't reset it by force-closing).
+    @Volatile private var calcCount            = 0
+    @Volatile private var lastInterstitialTime = 0L
+
     private companion object {
-        const val CALC_THRESHOLD  = 5            // show after every 5 calculations
-        const val COOLDOWN_MS     = 5 * 60_000L  // 5-minute minimum cooldown
+        const val CALC_THRESHOLD  = 3            // show after every 3 calculations
+        const val COOLDOWN_MS     = 3 * 60_000L  // 3-minute minimum cooldown
+    }
+
+    init {
+        scope.launch {
+            calcCount            = adRepo.getCalcCount()
+            lastInterstitialTime = adRepo.getLastInterstitialMs()
+        }
     }
 
     fun preloadInterstitial() {
@@ -106,16 +124,22 @@ class AdManager @Inject constructor(
     /**
      * Call after every completed calculation.
      * Shows interstitial after [CALC_THRESHOLD] calculations with a [COOLDOWN_MS] cooldown.
+     * Counter persists across restarts — users cannot bypass by force-closing.
      * [onCompleted] is always called, whether or not an ad is shown.
      */
     fun onCalculation(activity: Activity, onCompleted: () -> Unit = {}) {
         if (!AdConfig.ADS_ENABLED) { onCompleted(); return }
         calcCount++
+        scope.launch { adRepo.saveCalcCount(calcCount) }
         if (calcCount >= CALC_THRESHOLD) {
             val now = System.currentTimeMillis()
             if (now - lastInterstitialTime >= COOLDOWN_MS) {
                 calcCount = 0
                 lastInterstitialTime = now
+                scope.launch {
+                    adRepo.saveCalcCount(0)
+                    adRepo.saveLastInterstitialMs(now)
+                }
                 showInterstitial(activity, onCompleted)
                 return
             }

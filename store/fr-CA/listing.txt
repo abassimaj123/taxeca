@@ -2,7 +2,7 @@ App: Calculateur de taxes Canada — TaxeCA
 Langues: Français, Anglais
 
 Description courte:
-Calculateur de taxes de vente pour toutes les provinces — TPS/TVH/TVQ/TPV 2026.
+Calculateur de taxes de vente pour toutes les provinces — TPS/TVH/TVQ/PST 2026.
 
 Description complète:
 TaxeCA est le calculateur de taxes de vente canadiennes le plus rapide et le plus précis — couvrant toutes les provinces et tous les territoires avec des taux à jour pour 2026.
@@ -10,7 +10,7 @@ TaxeCA est le calculateur de taxes de vente canadiennes le plus rapide et le plu
 Que vous fassiez des achats, dîniez au restaurant ou partagiez une addition, TaxeCA vous donne le détail exact en quelques secondes.
 
 Fonctionnalités :
-- Calcul de la TPS/TVH/TPV pour les 13 provinces et territoires
+- Calcul de la TPS/TVH/PST pour les 13 provinces et territoires
 - Taux exacts TPS/TVQ pour le Québec (5 % + 9,975 %)
 - Mode Pourboire : calculez le pourboire en pourcentage ou en montant fixe
 - Mode Restaurant : taxes + pourboire + partage de l'addition par personne

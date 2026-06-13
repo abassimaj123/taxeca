@@ -202,22 +202,30 @@ class IAPManager @Inject constructor(
                 .build()
             // Must launch on main thread
             scope.launch(Dispatchers.Main) {
-                val result = billingClient.launchBillingFlow(activity, billingFlowParams)
-                Log.d(TAG, "launchBillingFlow responseCode=${result.responseCode}, " +
-                        "debugMessage=${result.debugMessage}")
-                // If the flow did NOT open (responseCode != OK), onPurchasesUpdated will
-                // never fire — resolve the pending callbacks here or the UI hangs forever.
-                if (result.responseCode != BillingClient.BillingResponseCode.OK) {
-                    when (result.responseCode) {
-                        BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED ->
-                            unlockAlreadyOwned()
-                        BillingClient.BillingResponseCode.USER_CANCELED -> {
-                            _onPurchaseError?.invoke("cancelled"); clearCallbacks()
-                        }
-                        else -> {
-                            _onPurchaseError?.invoke(result.debugMessage); clearCallbacks()
+                try {
+                    val result = billingClient.launchBillingFlow(activity, billingFlowParams)
+                    Log.d(TAG, "launchBillingFlow responseCode=${result.responseCode}, " +
+                            "debugMessage=${result.debugMessage}")
+                    // If the flow did NOT open (responseCode != OK), onPurchasesUpdated will
+                    // never fire — resolve the pending callbacks here or the UI hangs forever.
+                    if (result.responseCode != BillingClient.BillingResponseCode.OK) {
+                        when (result.responseCode) {
+                            BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED ->
+                                unlockAlreadyOwned()
+                            BillingClient.BillingResponseCode.USER_CANCELED -> {
+                                _onPurchaseError?.invoke("cancelled"); clearCallbacks()
+                            }
+                            else -> {
+                                _onPurchaseError?.invoke(result.debugMessage); clearCallbacks()
+                            }
                         }
                     }
+                } catch (e: Exception) {
+                    // Billing lib 7.x can throw RuntimeException/NPE on Android 11 if
+                    // Play Store returns a null PendingIntent (ProxyBillingActivity crash).
+                    Log.e(TAG, "launchBillingFlow threw exception: ${e.message}", e)
+                    _onPurchaseError?.invoke("store_unavailable")
+                    clearCallbacks()
                 }
             }
         }

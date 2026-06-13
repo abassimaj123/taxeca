@@ -49,6 +49,18 @@ class AnalyticsManager @Inject constructor(
     fun logPaywallDismissed()  = log("paywall_dismissed")
     fun logPurchaseStarted()   = log("iap_purchase_started")
     fun logPurchaseSuccess()   = log("iap_purchase_success")
+
+    fun logPurchaseCompleted(value: Double, currency: String) {
+        log("iap_purchase_success")
+        // GA4 standard purchase event — joins with BigQuery and Revenue metrics
+        val bundle = Bundle().apply {
+            putDouble(FirebaseAnalytics.Param.VALUE, value)
+            putString(FirebaseAnalytics.Param.CURRENCY, currency.ifBlank { "USD" })
+            putString(FirebaseAnalytics.Param.TRANSACTION_ID, System.currentTimeMillis().toString())
+        }
+        fa.logEvent(FirebaseAnalytics.Event.PURCHASE, bundle)
+    }
+
     fun logPurchaseError(reason: String) = log("iap_purchase_error", "reason" to reason)
     fun logRewardedAdShown()     = log("rewarded_ad_shown")
     fun logRewardedAdCompleted() = log("rewarded_ad_completed")

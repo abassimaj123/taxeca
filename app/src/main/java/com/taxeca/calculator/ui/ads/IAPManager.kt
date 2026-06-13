@@ -42,6 +42,11 @@ class IAPManager @Inject constructor(
     private var _onPurchaseSuccess: (() -> Unit)? = null
     private var _onPurchaseError: ((String) -> Unit)? = null
 
+    private var _pendingPurchaseAmountMicros: Long = 0L
+    private var _pendingPurchaseCurrencyCode: String = ""
+    val pendingPurchaseValue: Double get() = _pendingPurchaseAmountMicros / 1_000_000.0
+    val pendingPurchaseCurrency: String get() = _pendingPurchaseCurrencyCode
+
     private val billingClient: BillingClient = BillingClient.newBuilder(context)
         .setListener(this)
         .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
@@ -179,6 +184,10 @@ class IAPManager @Inject constructor(
                 Log.e(TAG, "Product '$PRODUCT_ID' not found — check Play Console product status")
                 onError("Product not found")
                 return@launch
+            }
+            productDetails.oneTimePurchaseOfferDetails?.let { offer ->
+                _pendingPurchaseAmountMicros = offer.priceAmountMicros
+                _pendingPurchaseCurrencyCode = offer.priceCurrencyCode
             }
             Log.d(TAG, "Launching billing flow for: ${productDetails.productId}, " +
                     "price=${productDetails.oneTimePurchaseOfferDetails?.formattedPrice}")

@@ -258,7 +258,10 @@ class FreemiumViewModel @Inject constructor(
         iapManager.launchPurchase(
             activity = activity,
             onSuccess = {
-                analytics.log("iap_purchase_success")
+                analytics.logPurchaseCompleted(
+                    iapManager.pendingPurchaseValue,
+                    iapManager.pendingPurchaseCurrency,
+                )
                 analytics.setUserProperty("is_premium", "true")
                 _hasAccess.value = true
                 reviewManager.maybeRequestReview(activity)

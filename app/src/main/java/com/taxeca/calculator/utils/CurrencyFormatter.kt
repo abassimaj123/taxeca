@@ -22,8 +22,4 @@ object CurrencyFormatter {
             "$formatted%"
         }
     }
-
-    fun formatRate(rate: Double): String {
-        return formatPercent(rate)
-    }
 }

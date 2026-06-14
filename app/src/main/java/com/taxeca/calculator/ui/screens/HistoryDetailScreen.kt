@@ -28,6 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +44,8 @@ import com.taxeca.calculator.data.model.HistoryEntity
 import com.taxeca.calculator.domain.model.Province
 import com.taxeca.calculator.ui.components.GradientButton
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
+import com.taxeca.calculator.ui.components.PremiumBannerSection
+import com.taxeca.calculator.ui.components.UnlockBottomSheet
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.taxeca.calculator.ui.theme.AccentGreen
 import com.taxeca.calculator.ui.theme.AccentGreenDark
@@ -115,6 +120,9 @@ fun HistoryDetailScreen(
 
     val freemiumVm = LocalFreemiumViewModel.current
     val hasAccess by freemiumVm.hasAccess.collectAsStateWithLifecycle()
+
+    var showUnlockSheet by remember { mutableStateOf(false) }
+    var pendingAction   by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     LazyColumn(
         modifier = Modifier
@@ -339,7 +347,8 @@ fun HistoryDetailScreen(
                                 )
                             }
                             if (!hasAccess) {
-                                freemiumVm.requestAccess(context) { doShare() }
+                                pendingAction = { doShare() }
+                                showUnlockSheet = true
                             } else {
                                 doShare()
                             }
@@ -357,9 +366,8 @@ fun HistoryDetailScreen(
                         text = if (hasAccess) "PDF" else "🔒 PDF",
                         onClick = {
                             if (!hasAccess) {
-                                freemiumVm.requestAccess(context) {
-                                    viewModel.exportPdf(context, isFr)
-                                }
+                                pendingAction = { viewModel.exportPdf(context, isFr) }
+                                showUnlockSheet = true
                             } else {
                                 viewModel.exportPdf(context, isFr)
                             }
@@ -385,7 +393,21 @@ fun HistoryDetailScreen(
             }
         }
 
-        item { Spacer(Modifier.height(16.dp)) }
+        item {
+            PremiumBannerSection(modifier = Modifier.fillMaxWidth())
+        }
+
+        item { Spacer(Modifier.height(24.dp)) }
+    }
+
+    if (showUnlockSheet) {
+        UnlockBottomSheet(onDismiss = {
+            showUnlockSheet = false
+            if (hasAccess) {
+                pendingAction?.invoke()
+                pendingAction = null
+            }
+        })
     }
 }
 

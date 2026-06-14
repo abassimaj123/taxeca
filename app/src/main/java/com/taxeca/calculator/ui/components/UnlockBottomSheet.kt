@@ -19,7 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material.icons.filled.PlayCircleOutline
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.CircularProgressIndicator
@@ -212,7 +212,7 @@ fun UnlockBottomSheet(onDismiss: () -> Unit) {
             // ── Watch Ad tile (SECONDARY) ─────────────────────────────────
             if (!isRewarded) {
                 _UnlockTile(
-                    icon     = Icons.Default.PlayCircleOutline,
+                    icon     = Icons.Default.Shield,
                     title    = stringResource(R.string.freemium_watch_ad),
                     subtitle = stringResource(R.string.unlock_watch_subtitle),
                     enabled  = canWatch && !isLoading,

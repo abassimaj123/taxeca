@@ -47,7 +47,9 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -67,6 +69,7 @@ import com.taxeca.calculator.domain.model.ShoppingListResult
 import com.taxeca.calculator.ui.components.PremiumBannerSection
 import com.taxeca.calculator.ui.components.GradientButton
 import com.taxeca.calculator.ui.components.ProvinceSelector
+import com.taxeca.calculator.ui.components.UnlockBottomSheet
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
 import com.taxeca.calculator.ui.theme.AccentGreen
 import com.taxeca.calculator.ui.utils.getDefaultEnterTransition
@@ -91,6 +94,9 @@ fun ShoppingScreen(
     val saveConfirmed   by viewModel.saveConfirmed.collectAsStateWithLifecycle()
 
     val hasResult = listResult != null
+
+    var showUnlockSheet  by remember { mutableStateOf(false) }
+    var pendingShareText by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) { viewModel.logScreenView() }
 
@@ -300,15 +306,8 @@ fun ShoppingScreen(
                         GradientButton(
                             text    = stringResource(R.string.btn_share),
                             onClick = {
-                                val intent = Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_TEXT, buildShareText(result))
-                                }
-                                context.startActivity(Intent.createChooser(intent, null))
-                                viewModel.logShare()
-                                freemiumVm.trackCalculation(context)
-                                viewModel.saveToHistory()
-                                viewModel.resetDisplay()
+                                pendingShareText = buildShareText(result)
+                                showUnlockSheet  = true
                             },
                             modifier = Modifier
                                 .weight(1f)
@@ -323,6 +322,28 @@ fun ShoppingScreen(
         item { Spacer(Modifier.height(16.dp)) }
     }
     } // end Box
+
+    if (showUnlockSheet) {
+        UnlockBottomSheet(onDismiss = {
+            showUnlockSheet = false
+            val text = pendingShareText
+            if (text != null && freemiumVm.hasAccess.value) {
+                context.startActivity(
+                    Intent.createChooser(
+                        Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, text)
+                        }, null
+                    )
+                )
+                viewModel.logShare()
+                freemiumVm.trackCalculation(context)
+                viewModel.saveToHistory()
+                viewModel.resetDisplay()
+                pendingShareText = null
+            }
+        })
+    }
 }
 
 // ── Swipe-to-delete item row ──────────────────────────────────────────────────

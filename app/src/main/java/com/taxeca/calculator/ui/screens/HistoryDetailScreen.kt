@@ -44,6 +44,7 @@ import com.taxeca.calculator.data.model.HistoryEntity
 import com.taxeca.calculator.domain.model.Province
 import com.taxeca.calculator.ui.components.GradientButton
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
+import com.taxeca.calculator.ui.components.AdBanner
 import com.taxeca.calculator.ui.components.PremiumBannerSection
 import com.taxeca.calculator.ui.components.UnlockBottomSheet
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -397,7 +398,11 @@ fun HistoryDetailScreen(
             PremiumBannerSection(modifier = Modifier.fillMaxWidth())
         }
 
-        item { Spacer(Modifier.height(24.dp)) }
+        item {
+            AdBanner(modifier = Modifier.fillMaxWidth())
+        }
+
+        item { Spacer(Modifier.height(8.dp)) }
     }
 
     if (showUnlockSheet) {

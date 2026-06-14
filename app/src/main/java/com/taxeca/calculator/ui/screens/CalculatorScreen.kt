@@ -38,7 +38,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -51,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.taxeca.calculator.R
 import com.taxeca.calculator.domain.model.TaxResult
 import com.taxeca.calculator.ui.components.PremiumBannerSection
+import com.taxeca.calculator.ui.components.UnlockBottomSheet
 import com.taxeca.calculator.ui.components.GradientButton
 import com.taxeca.calculator.ui.components.ModeToggle
 import com.taxeca.calculator.ui.components.PillButton
@@ -93,6 +96,9 @@ fun CalculatorScreen(
     val saveConfirmed    by viewModel.saveConfirmed.collectAsStateWithLifecycle()
 
     val accentGreen = if (isSystemInDarkTheme()) AccentGreenDark else AccentGreen
+
+    var showUnlockSheet  by remember { mutableStateOf(false) }
+    var pendingShareData by remember { mutableStateOf<String?>(null) }
 
     val hasResult = taxResult != null && isInputValid
     val snackbarHostState = remember { SnackbarHostState() }
@@ -392,18 +398,8 @@ fun CalculatorScreen(
                                 r, tipEnabled, tipAmount, grandTotal,
                                 splitEnabled, splitCount, perPerson
                             )
-                            context.startActivity(
-                                Intent.createChooser(
-                                    Intent(Intent.ACTION_SEND).apply {
-                                        type = "text/plain"
-                                        putExtra(Intent.EXTRA_TEXT, text)
-                                    }, null
-                                )
-                            )
-                            viewModel.logShareResult(r.province.code, "text")
-                            freemiumVm.trackCalculation(context)
-                            viewModel.saveToHistory()
-                            viewModel.resetDisplay()
+                            pendingShareData = text
+                            showUnlockSheet  = true
                         }
                     },
                     enabled  = hasResult,
@@ -428,6 +424,30 @@ fun CalculatorScreen(
                 )
             }
         )
+    }
+
+    if (showUnlockSheet) {
+        UnlockBottomSheet(onDismiss = {
+            showUnlockSheet = false
+            val text = pendingShareData
+            if (text != null && freemiumVm.hasAccess.value) {
+                context.startActivity(
+                    Intent.createChooser(
+                        Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, text)
+                        }, null
+                    )
+                )
+                taxResult?.let { r ->
+                    viewModel.logShareResult(r.province.code, "text")
+                    freemiumVm.trackCalculation(context)
+                    viewModel.saveToHistory()
+                    viewModel.resetDisplay()
+                }
+                pendingShareData = null
+            }
+        })
     }
 }
 

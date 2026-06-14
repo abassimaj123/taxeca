@@ -45,7 +45,9 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -64,6 +66,7 @@ import com.taxeca.calculator.ui.components.PremiumBannerSection
 import com.taxeca.calculator.ui.components.GradientButton
 import com.taxeca.calculator.ui.components.PillButton
 import com.taxeca.calculator.ui.components.ProvinceSelector
+import com.taxeca.calculator.ui.components.UnlockBottomSheet
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.taxeca.calculator.ui.theme.AccentGreen
@@ -101,6 +104,9 @@ fun RestaurantScreen(
 
     val hasResult    = result != null && isInputValid
     val itemPriceFocus = remember { FocusRequester() }
+
+    var showUnlockSheet  by remember { mutableStateOf(false) }
+    var pendingShareText by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) { viewModel.logScreenView() }
 
@@ -466,16 +472,8 @@ fun RestaurantScreen(
                             GradientButton(
                                 text    = stringResource(R.string.btn_share),
                                 onClick = {
-                                    val text = buildRestaurantShareText(r)
-                                    val intent = Intent(Intent.ACTION_SEND).apply {
-                                        type = "text/plain"
-                                        putExtra(Intent.EXTRA_TEXT, text)
-                                    }
-                                    ctx.startActivity(Intent.createChooser(intent, null))
-                                    viewModel.logShare()
-                                    freemiumVm.trackCalculation(ctx)
-                                    viewModel.saveToHistory()
-                                    viewModel.resetDisplay()
+                                    pendingShareText = buildRestaurantShareText(r)
+                                    showUnlockSheet  = true
                                 },
                                 modifier = Modifier
                                     .weight(1f)
@@ -491,6 +489,28 @@ fun RestaurantScreen(
         item { Spacer(Modifier.height(16.dp)) }
     }
     } // end Box
+
+    if (showUnlockSheet) {
+        UnlockBottomSheet(onDismiss = {
+            showUnlockSheet = false
+            val text = pendingShareText
+            if (text != null && freemiumVm.hasAccess.value) {
+                ctx.startActivity(
+                    Intent.createChooser(
+                        Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, text)
+                        }, null
+                    )
+                )
+                viewModel.logShare()
+                freemiumVm.trackCalculation(ctx)
+                viewModel.saveToHistory()
+                viewModel.resetDisplay()
+                pendingShareText = null
+            }
+        })
+    }
 }
 
 // ── Restaurant item row (swipe to delete) ────────────────────────────────────

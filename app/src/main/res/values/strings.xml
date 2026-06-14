@@ -90,7 +90,7 @@
     <!-- Freemium gate -->
     <string name="freemium_gate_title">Trial ended</string>
     <string name="freemium_gate_message">Watch a short ad to unlock this feature for 60 minutes.</string>
-    <string name="freemium_watch_ad">Watch Ad</string>
+    <string name="freemium_watch_ad">Watch a video — 60 min premium</string>
     <string name="freemium_loading_ad">Loading ad…</string>
 
     <!-- Navigation tabs -->
@@ -155,7 +155,7 @@
     <!-- Unlock bottom sheet -->
     <string name="unlock_btn_label">🔒 Unlock Full Access</string>
     <string name="unlock_sheet_title">Unlock Full Access</string>
-    <string name="unlock_watch_subtitle">60 min free access</string>
+    <string name="unlock_watch_subtitle">Free 60-min full access, no commitment</string>
     <string name="unlock_premium_subtitle">No ads · Unlimited history</string>
     <string name="unlock_access_active">Access active · %1$dm remaining</string>
     <string name="unlock_ad_unavailable">Ad not available. Try again later.</string>

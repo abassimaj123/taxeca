@@ -88,7 +88,7 @@
     <!-- Freemium gate -->
     <string name="freemium_gate_title">Essai terminé</string>
     <string name="freemium_gate_message">Regardez une courte pub pour déverrouiller cette fonction pendant 60 minutes.</string>
-    <string name="freemium_watch_ad">Voir la pub</string>
+    <string name="freemium_watch_ad">Regarder une vidéo — 60 min premium</string>
     <string name="freemium_loading_ad">Chargement…</string>
 
     <!-- Navigation tabs -->
@@ -153,7 +153,7 @@
     <!-- Unlock bottom sheet -->
     <string name="unlock_btn_label">🔒 Déverrouiller l\'accès complet</string>
     <string name="unlock_sheet_title">Déverrouiller l\'accès complet</string>
-    <string name="unlock_watch_subtitle">60 min d\'accès gratuit</string>
+    <string name="unlock_watch_subtitle">60 min d\'accès complet, sans engagement</string>
     <string name="unlock_premium_subtitle">Sans pub · Historique illimité</string>
     <string name="unlock_access_active">Accès actif · %1$dm restant</string>
     <string name="unlock_ad_unavailable">Pub non disponible. Réessayez plus tard.</string>

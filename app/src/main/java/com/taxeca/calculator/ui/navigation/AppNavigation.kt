@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -110,6 +111,7 @@ fun AppNavigation() {
         NavItem(Screen.History,    Icons.Default.History,      R.string.tab_history)
     )
 
+    val focusManager          = LocalFocusManager.current
     val navBackStackEntry    by navController.currentBackStackEntryAsState()
     val currentDestination   = navBackStackEntry?.destination
     val isOnHistoryDetail    = currentDestination?.route?.startsWith("history_detail") == true
@@ -203,6 +205,7 @@ fun AppNavigation() {
                             }
                             IconButton(
                                 onClick = {
+                                    focusManager.clearFocus()
                                     navController.navigate(Screen.Settings.route) {
                                         launchSingleTop = true
                                     }
@@ -244,6 +247,7 @@ fun AppNavigation() {
                                     indicatorColor      = MaterialTheme.colorScheme.primaryContainer
                                 ),
                                 onClick = {
+                                    focusManager.clearFocus()
                                     freemiumVm.logTabChanged(item.screen.route)
                                     navController.navigate(item.screen.route) {
                                         popUpTo(navController.graph.findStartDestination().id) {

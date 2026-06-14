@@ -9,8 +9,8 @@
     <!-- Labels -->
     <string name="label_province">Province / Territoire</string>
     <string name="label_amount">Montant</string>
-    <string name="label_mode_forward">Avant</string>
-    <string name="label_mode_reverse">Inverse</string>
+    <string name="label_mode_forward">HT (hors taxes)</string>
+    <string name="label_mode_reverse">TTC (toutes taxes)</string>
 
     <!-- Tax labels -->
     <string name="label_gst">TPS</string>
@@ -39,7 +39,8 @@
     <string name="btn_delete">Supprimer</string>
 
     <!-- Hints -->
-    <string name="hint_enter_amount">Entrez le montant</string>
+    <string name="hint_enter_amount">Montant (hors taxes)</string>
+    <string name="hint_enter_amount_ttc">Montant (toutes taxes)</string>
 
     <!-- Split -->
     <string name="calculator_split_toggle">Diviser la note</string>

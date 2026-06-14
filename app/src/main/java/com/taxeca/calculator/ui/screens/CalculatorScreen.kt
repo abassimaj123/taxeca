@@ -135,10 +135,15 @@ fun CalculatorScreen(
         }
 
         item {
+            val amountLabel = if (mode == com.taxeca.calculator.domain.model.CalculationMode.REVERSE) {
+                stringResource(R.string.hint_enter_amount_ttc)
+            } else {
+                stringResource(R.string.hint_enter_amount)
+            }
             OutlinedTextField(
                 value         = amountInput,
                 onValueChange = viewModel::onAmountChange,
-                label         = { Text(stringResource(R.string.hint_enter_amount)) },
+                label         = { Text(amountLabel) },
                 prefix        = { Text("$") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine    = true,
@@ -475,10 +480,11 @@ private fun buildCalculatorShareText(
     val pct: (Double) -> String = { CurrencyFormatter.formatPercent(it) }
 
     return buildString {
-        appendLine("📋 TaxeCA — Calculatrice")
+        val modeLabel = if (r.mode == com.taxeca.calculator.domain.model.CalculationMode.REVERSE) "TTC" else "HT"
+        appendLine("📋 TaxeCA — Calculatrice ($modeLabel)")
         appendLine("${r.province.nameFr} / ${r.province.nameEn} (${r.province.code})")
         appendLine(sep)
-        appendLine(lv("Montant / Amount", fmt(r.baseAmount)))
+        appendLine(lv("Montant HT / Base Amount", fmt(r.baseAmount)))
         if (!r.province.isHstProvince && r.province.gstRate > 0)
             appendLine(lv("TPS/GST (${pct(r.province.gstRate)})", fmt(r.gstAmount)))
         if (!r.province.isHstProvince && r.province.pstRate > 0) {

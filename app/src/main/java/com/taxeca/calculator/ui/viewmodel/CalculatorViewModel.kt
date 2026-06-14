@@ -141,6 +141,10 @@ class CalculatorViewModel @Inject constructor(
 
     fun onModeChange(newMode: CalculationMode) {
         _mode.value = newMode
+        analytics.log(
+            "price_mode_changed",
+            "mode" to if (newMode == CalculationMode.REVERSE) "TTC" else "HT"
+        )
         scheduleCalculation()
     }
 

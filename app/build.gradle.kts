@@ -23,8 +23,8 @@ android {
         applicationId = "com.taxeca.calculator"
         minSdk = 24
         targetSdk = 36
-        versionCode = 16
-        versionName = "1.0.5"
+        versionCode = 17
+        versionName = "1.0.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

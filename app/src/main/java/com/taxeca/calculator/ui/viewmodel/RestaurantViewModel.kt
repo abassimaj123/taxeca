@@ -225,6 +225,7 @@ class RestaurantViewModel @Inject constructor(
                 "split"   to _splitCount.value
             )
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             analytics.recordException(e)
         }
     }

@@ -55,6 +55,7 @@ class ShoppingViewModel @Inject constructor(
         else try {
             calculateShoppingList(items, province)
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             analytics.recordException(e)
             null
         }

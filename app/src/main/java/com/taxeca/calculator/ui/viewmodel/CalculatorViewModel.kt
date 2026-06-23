@@ -235,6 +235,7 @@ class CalculatorViewModel @Inject constructor(
                     settingsRepo.markFirstCalcDone()
                 }
             } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
                 analytics.recordException(e)
             }
         }

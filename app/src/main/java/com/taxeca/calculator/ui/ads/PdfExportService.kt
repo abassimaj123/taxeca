@@ -43,6 +43,9 @@ class PdfExportService @Inject constructor(
             withContext(Dispatchers.Main) { sharePdf(file) }
             analytics.log("pdf_exported", "mode" to entity.mode)
         } catch (e: Exception) {
+            // Coroutine cancellation is normal (user navigated away / job cancelled) —
+            // re-throw so it isn't logged to Crashlytics as a non-fatal.
+            if (e is kotlinx.coroutines.CancellationException) throw e
             Log.e(TAG, "PDF export failed", e)
             analytics.recordException(e)
         }

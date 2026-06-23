@@ -133,7 +133,11 @@ class AdManager @Inject constructor(
         scope.launch { adRepo.saveCalcCount(calcCount) }
         if (calcCount >= CALC_THRESHOLD) {
             val now = System.currentTimeMillis()
-            if (now - lastInterstitialTime >= COOLDOWN_MS) {
+            val cooldownElapsed = now - lastInterstitialTime >= COOLDOWN_MS
+            // Only consume the slot + arm the cooldown when an ad is actually
+            // ready to show. Otherwise a not-yet-loaded ad would burn the
+            // impression opportunity AND start a 3-min cooldown for nothing.
+            if (cooldownElapsed && interstitialAd != null) {
                 calcCount = 0
                 lastInterstitialTime = now
                 scope.launch {
@@ -143,6 +147,8 @@ class AdManager @Inject constructor(
                 showInterstitial(activity, onCompleted)
                 return
             }
+            // Threshold reached but no ad ready — make sure one is loading.
+            preloadInterstitial()
         }
         onCompleted()
     }

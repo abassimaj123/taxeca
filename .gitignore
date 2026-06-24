@@ -13,4 +13,5 @@ google-services.json
 /keystore/
 proguard/
 test-results/
+.kotlin/
 .claude/

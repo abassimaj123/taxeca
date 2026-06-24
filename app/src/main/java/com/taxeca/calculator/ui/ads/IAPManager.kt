@@ -69,7 +69,7 @@ class IAPManager @Inject constructor(
             billingClient.startConnection(object : BillingClientStateListener {
                 override fun onBillingSetupFinished(result: BillingResult) {
                     if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                        Log.d(TAG, "BillingClient connected (attempt ${reconnectAttempts + 1})")
+                        if (BuildConfig.DEBUG) Log.d(TAG, "BillingClient connected (attempt ${reconnectAttempts + 1})")
                         reconnectAttempts = 0 // reset on success
                         scope.launch {
                             queryExistingPurchases()
@@ -112,7 +112,7 @@ class IAPManager @Inject constructor(
         // Retry with backoff: 5s → 20s → 45s (max 3 attempts)
         if (attempt < 3) {
             val delayMs = 5000L * attempt * attempt
-            Log.d(TAG, "Retrying price fetch in ${delayMs / 1000}s…")
+            if (BuildConfig.DEBUG) Log.d(TAG, "Retrying price fetch in ${delayMs / 1000}s…")
             kotlinx.coroutines.delay(delayMs)
             queryProductPrice(attempt + 1)
         }
@@ -176,7 +176,7 @@ class IAPManager @Inject constructor(
                 .setProductList(productList)
                 .build()
             val detailsResult = billingClient.queryProductDetails(params)
-            Log.d(TAG, "queryProductDetails responseCode=${detailsResult.billingResult.responseCode}, " +
+            if (BuildConfig.DEBUG) Log.d(TAG, "queryProductDetails responseCode=${detailsResult.billingResult.responseCode}, " +
                     "debugMessage=${detailsResult.billingResult.debugMessage}, " +
                     "products=${detailsResult.productDetailsList?.size ?: 0}")
             val productDetails = detailsResult.productDetailsList?.firstOrNull()
@@ -189,7 +189,7 @@ class IAPManager @Inject constructor(
                 _pendingPurchaseAmountMicros = offer.priceAmountMicros
                 _pendingPurchaseCurrencyCode = offer.priceCurrencyCode
             }
-            Log.d(TAG, "Launching billing flow for: ${productDetails.productId}, " +
+            if (BuildConfig.DEBUG) Log.d(TAG, "Launching billing flow for: ${productDetails.productId}, " +
                     "price=${productDetails.oneTimePurchaseOfferDetails?.formattedPrice}")
             val billingFlowParams = BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(
@@ -204,7 +204,7 @@ class IAPManager @Inject constructor(
             scope.launch(Dispatchers.Main) {
                 try {
                     val result = billingClient.launchBillingFlow(activity, billingFlowParams)
-                    Log.d(TAG, "launchBillingFlow responseCode=${result.responseCode}, " +
+                    if (BuildConfig.DEBUG) Log.d(TAG, "launchBillingFlow responseCode=${result.responseCode}, " +
                             "debugMessage=${result.debugMessage}")
                     // If the flow did NOT open (responseCode != OK), onPurchasesUpdated will
                     // never fire — resolve the pending callbacks here or the UI hangs forever.
@@ -310,7 +310,7 @@ class IAPManager @Inject constructor(
                             // Payment deferred (cash, parental approval). Don't leave the UI
                             // spinning — inform the user; entitlement is granted later via
                             // queryExistingPurchases once it clears to PURCHASED.
-                            Log.d(TAG, "Purchase pending — awaiting completion")
+                            if (BuildConfig.DEBUG) Log.d(TAG, "Purchase pending — awaiting completion")
                             _onPurchaseError?.invoke("pending")
                             clearCallbacks()
                         }
@@ -321,16 +321,16 @@ class IAPManager @Inject constructor(
             BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
                 // User already owns premium (other device, or local state lost).
                 // This is NOT an error — sync entitlement and grant access.
-                Log.d(TAG, "Item already owned — syncing entitlement")
+                if (BuildConfig.DEBUG) Log.d(TAG, "Item already owned — syncing entitlement")
                 unlockAlreadyOwned()
             }
             BillingClient.BillingResponseCode.USER_CANCELED -> {
-                Log.d(TAG, "User cancelled purchase")
+                if (BuildConfig.DEBUG) Log.d(TAG, "User cancelled purchase")
                 _onPurchaseError?.invoke("cancelled")
                 clearCallbacks()
             }
             else -> {
-                Log.d(TAG, "Purchase error: ${result.debugMessage}")
+                if (BuildConfig.DEBUG) Log.d(TAG, "Purchase error: ${result.debugMessage}")
                 _onPurchaseError?.invoke(result.debugMessage)
                 clearCallbacks()
             }

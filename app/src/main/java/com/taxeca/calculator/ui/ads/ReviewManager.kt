@@ -38,10 +38,10 @@ class ReviewManager @Inject constructor(
                 prefs.edit().putBoolean(PREF_KEY, true).apply()
                 manager.launchReviewFlow(activity, task.result)
                     .addOnCompleteListener {
-                        Log.d(TAG, "Review flow completed")
+                        if (BuildConfig.DEBUG) Log.d(TAG, "Review flow completed")
                     }
             } else {
-                Log.d(TAG, "Review request failed: ${task.exception}")
+                if (BuildConfig.DEBUG) Log.d(TAG, "Review request failed: ${task.exception}")
             }
         }
     }

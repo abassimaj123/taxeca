@@ -211,7 +211,7 @@ class FreemiumViewModel @Inject constructor(
                 analytics.logRewardedAdFailed()
                 _isLoadingAd.value = false
                 _adUnavailable.value = true
-                Log.d("FreemiumVM", "Rewarded ad unavailable — access denied")
+                if (BuildConfig.DEBUG) Log.d("FreemiumVM", "Rewarded ad unavailable — access denied")
             }
         )
     }

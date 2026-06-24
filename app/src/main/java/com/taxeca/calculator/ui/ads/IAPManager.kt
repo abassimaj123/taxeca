@@ -107,6 +107,7 @@ class IAPManager @Inject constructor(
                 return  // ✅ success
             }
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             if (BuildConfig.DEBUG) Log.w(TAG, "Price fetch error (attempt $attempt): ${e.message}")
         }
         // Retry with backoff: 5s → 20s → 45s (max 3 attempts)
@@ -221,6 +222,7 @@ class IAPManager @Inject constructor(
                         }
                     }
                 } catch (e: Exception) {
+                    if (e is kotlinx.coroutines.CancellationException) throw e
                     // Billing lib 7.x can throw RuntimeException/NPE on Android 11 if
                     // Play Store returns a null PendingIntent (ProxyBillingActivity crash).
                     if (BuildConfig.DEBUG) Log.e(TAG, "launchBillingFlow threw exception: ${e.message}", e)

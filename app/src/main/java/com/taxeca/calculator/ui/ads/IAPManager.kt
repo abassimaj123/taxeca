@@ -61,7 +61,7 @@ class IAPManager @Inject constructor(
 
     private fun connect(delayMs: Long = 0L) {
         if (reconnectAttempts >= maxReconnectAttempts) {
-            Log.w(TAG, "BillingClient: max reconnect attempts reached — giving up")
+            if (BuildConfig.DEBUG) Log.w(TAG, "BillingClient: max reconnect attempts reached — giving up")
             return
         }
         scope.launch {
@@ -80,7 +80,7 @@ class IAPManager @Inject constructor(
                 override fun onBillingServiceDisconnected() {
                     reconnectAttempts++
                     val backoffMs = minOf(1000L * (1 shl reconnectAttempts), 30_000L) // 2s, 4s, 8s … 30s cap
-                    Log.w(TAG, "BillingClient disconnected — retry #$reconnectAttempts in ${backoffMs}ms")
+                    if (BuildConfig.DEBUG) Log.w(TAG, "BillingClient disconnected — retry #$reconnectAttempts in ${backoffMs}ms")
                     connect(backoffMs)
                 }
             })
@@ -107,7 +107,7 @@ class IAPManager @Inject constructor(
                 return  // ✅ success
             }
         } catch (e: Exception) {
-            Log.w(TAG, "Price fetch error (attempt $attempt): ${e.message}")
+            if (BuildConfig.DEBUG) Log.w(TAG, "Price fetch error (attempt $attempt): ${e.message}")
         }
         // Retry with backoff: 5s → 20s → 45s (max 3 attempts)
         if (attempt < 3) {
@@ -157,10 +157,10 @@ class IAPManager @Inject constructor(
         scope.launch {
             // Ensure BillingClient is connected before attempting purchase
             if (!billingClient.isReady) {
-                Log.w(TAG, "BillingClient not ready — reconnecting…")
+                if (BuildConfig.DEBUG) Log.w(TAG, "BillingClient not ready — reconnecting…")
                 val connected = suspendConnect()
                 if (!connected) {
-                    Log.e(TAG, "BillingClient reconnect failed")
+                    if (BuildConfig.DEBUG) Log.e(TAG, "BillingClient reconnect failed")
                     onError("Billing service unavailable")
                     return@launch
                 }
@@ -181,7 +181,7 @@ class IAPManager @Inject constructor(
                     "products=${detailsResult.productDetailsList?.size ?: 0}")
             val productDetails = detailsResult.productDetailsList?.firstOrNull()
             if (productDetails == null) {
-                Log.e(TAG, "Product '$PRODUCT_ID' not found — check Play Console product status")
+                if (BuildConfig.DEBUG) Log.e(TAG, "Product '$PRODUCT_ID' not found — check Play Console product status")
                 onError("Product not found")
                 return@launch
             }
@@ -223,7 +223,7 @@ class IAPManager @Inject constructor(
                 } catch (e: Exception) {
                     // Billing lib 7.x can throw RuntimeException/NPE on Android 11 if
                     // Play Store returns a null PendingIntent (ProxyBillingActivity crash).
-                    Log.e(TAG, "launchBillingFlow threw exception: ${e.message}", e)
+                    if (BuildConfig.DEBUG) Log.e(TAG, "launchBillingFlow threw exception: ${e.message}", e)
                     _onPurchaseError?.invoke("store_unavailable")
                     clearCallbacks()
                 }
@@ -287,7 +287,7 @@ class IAPManager @Inject constructor(
             // An unacknowledged purchase is auto-refunded by Google after 3 days.
             // Retry transient failures instead of relying solely on the next-launch sweep.
             if (result.responseCode != BillingClient.BillingResponseCode.OK && attempt < 4) {
-                Log.w(TAG, "Acknowledge failed (attempt $attempt): ${result.debugMessage} — retrying")
+                if (BuildConfig.DEBUG) Log.w(TAG, "Acknowledge failed (attempt $attempt): ${result.debugMessage} — retrying")
                 kotlinx.coroutines.delay(2000L * attempt)
                 acknowledgePurchase(purchase, attempt + 1)
             }

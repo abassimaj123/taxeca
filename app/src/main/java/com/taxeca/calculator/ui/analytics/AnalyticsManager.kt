@@ -75,7 +75,7 @@ class AnalyticsManager @Inject constructor(
     fun setKey(key: String, value: Int)     = crashlytics.setCustomKey(key, value)
 
     fun recordException(e: Throwable) {
-        Log.e("TaxeCA", "recordException: ${e.message}", e)
+        if (BuildConfig.DEBUG) Log.e("TaxeCA", "recordException: ${e.message}", e)
         crashlytics.recordException(e)
     }
 }

@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
                 UserMessagingPlatform.loadAndShowConsentFormIfRequired(this) { formError ->
                     if (formError != null) {
                         // Log error but proceed — don't block app
-                        Log.w("UMP", "Consent form error: ${formError.message}")
+                        if (BuildConfig.DEBUG) Log.w("UMP", "Consent form error: ${formError.message}")
                     }
                     // Initialize ads only if consent obtained OR not required
                     if (consentInfo.canRequestAds()) {
@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
             },
             { requestError ->
                 // Request failed — proceed conservatively without ads
-                Log.w("UMP", "Consent info update failed: ${requestError.message}")
+                if (BuildConfig.DEBUG) Log.w("UMP", "Consent info update failed: ${requestError.message}")
             }
         )
     }

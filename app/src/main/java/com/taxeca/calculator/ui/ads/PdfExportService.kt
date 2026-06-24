@@ -46,7 +46,7 @@ class PdfExportService @Inject constructor(
             // Coroutine cancellation is normal (user navigated away / job cancelled) —
             // re-throw so it isn't logged to Crashlytics as a non-fatal.
             if (e is kotlinx.coroutines.CancellationException) throw e
-            Log.e(TAG, "PDF export failed", e)
+            if (BuildConfig.DEBUG) Log.e(TAG, "PDF export failed", e)
             analytics.recordException(e)
         }
     }

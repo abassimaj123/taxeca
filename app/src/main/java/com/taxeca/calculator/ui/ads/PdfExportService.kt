@@ -2,6 +2,7 @@ package com.taxeca.calculator.ui.ads
 
 import android.content.Context
 import android.content.Intent
+import com.taxeca.calculator.BuildConfig
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint

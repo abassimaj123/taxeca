@@ -3,6 +3,7 @@ package com.taxeca.calculator.ui.viewmodel
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import com.taxeca.calculator.BuildConfig
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

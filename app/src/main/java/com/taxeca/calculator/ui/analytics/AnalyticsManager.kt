@@ -3,6 +3,7 @@ package com.taxeca.calculator.ui.analytics
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import com.taxeca.calculator.BuildConfig
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.qualifiers.ApplicationContext

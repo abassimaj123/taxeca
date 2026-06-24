@@ -3,6 +3,7 @@ package com.taxeca.calculator.ui.ads
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import com.taxeca.calculator.BuildConfig
 import com.google.android.play.core.review.ReviewManagerFactory
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

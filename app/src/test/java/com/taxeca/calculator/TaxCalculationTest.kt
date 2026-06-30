@@ -92,11 +92,11 @@ class TaxCalculationTest {
 
     // ── Manitoba ──────────────────────────────────────────────────────────────
 
-    @Test fun `MB forward 100 GST 5 00 RST 7 00 total 112 00`() {
+    @Test fun `MB forward 100 GST 5 00 RST 12 00 total 117 00`() {
         val r = calcTax(100.0, Province.MB)
-        assertEquals(5.0,  r.gstAmount,   DELTA)
-        assertEquals(7.0,  r.pstAmount,   DELTA)  // pstLabel = "RST"
-        assertEquals(112.0, r.totalAmount, DELTA)
+        assertEquals(5.0,   r.gstAmount,   DELTA)
+        assertEquals(12.0,  r.pstAmount,   DELTA)  // pstLabel = "RST" — Manitoba RST 12%
+        assertEquals(117.0, r.totalAmount, DELTA)
     }
 
     // ── Saskatchewan ──────────────────────────────────────────────────────────

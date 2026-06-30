@@ -67,11 +67,11 @@ class ReverseCalculateTaxUseCaseTest {
         assertEquals(7.0, result.pstAmount, DELTA)
     }
 
-    @Test fun `MB RST reverse 112 base 100 GST 5 RST 7`() {
-        val result = useCase(112.0, Province.MB)
+    @Test fun `MB RST reverse 117 base 100 GST 5 RST 12`() {
+        val result = useCase(117.0, Province.MB)
         assertEquals(100.0, result.baseAmount, DELTA)
-        assertEquals(5.0, result.gstAmount, DELTA)
-        assertEquals(7.0, result.pstAmount, DELTA)
+        assertEquals(5.0,   result.gstAmount,  DELTA)
+        assertEquals(12.0,  result.pstAmount,  DELTA)  // Manitoba RST 12%
     }
 
     @Test fun `SK GST+PST reverse 111 base 100 GST 5 PST 6`() {

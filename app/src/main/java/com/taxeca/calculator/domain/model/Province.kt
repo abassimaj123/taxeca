@@ -32,7 +32,7 @@ enum class Province(
         nameEn = "Manitoba",
         nameFr = "Manitoba",
         gstRate = 0.05,
-        pstRate = 0.07,
+        pstRate = 0.12, // Manitoba RST: 12% (in effect since 2013)
         hstRate = 0.0,
         pstLabel = "RST"
     ),

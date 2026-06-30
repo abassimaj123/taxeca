@@ -52,11 +52,14 @@ class AnalyticsManager @Inject constructor(
     fun logPurchaseSuccess()   = log("iap_purchase_success")
 
     fun logPurchaseCompleted(value: Double, currency: String) {
+        // Dual-logging is intentional and consistent across the Kotlin portfolio
+        // (see TaxUS AnalyticsManager.logPurchaseCompleted): the custom event feeds
+        // internal funnel dashboards, while the GA4 standard "purchase" event below
+        // joins with BigQuery / Revenue / ad-platform reporting. Keep both.
         log("iap_purchase_success")
-        // GA4 standard purchase event — joins with BigQuery and Revenue metrics
         val bundle = Bundle().apply {
             putDouble(FirebaseAnalytics.Param.VALUE, value)
-            putString(FirebaseAnalytics.Param.CURRENCY, currency.ifBlank { "USD" })
+            putString(FirebaseAnalytics.Param.CURRENCY, currency.ifBlank { "CAD" })
             putString(FirebaseAnalytics.Param.TRANSACTION_ID, System.currentTimeMillis().toString())
         }
         fa.logEvent(FirebaseAnalytics.Event.PURCHASE, bundle)

@@ -5,7 +5,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,16 +32,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.taxeca.calculator.R
 import com.taxeca.calculator.domain.model.TaxResult
-import com.taxeca.calculator.domain.model.taxLines
 import com.taxeca.calculator.ui.theme.AccentGreen
 import com.taxeca.calculator.utils.CurrencyFormatter
 
@@ -157,86 +152,6 @@ fun ResultCard(
                         )
                     }
 
-                    // Donut chart removed — not needed for a simple tax calculator
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TaxDonutChart(taxResult: TaxResult) {
-    // Theme colours — tertiary (Amber) is now defined in Theme.kt, visually distinct from red/teal
-    val segmentColors = listOf(
-        MaterialTheme.colorScheme.primary,    // GST or HST — Canada Red
-        MaterialTheme.colorScheme.secondary,  // PST / QST / RST — Teal
-        MaterialTheme.colorScheme.tertiary    // 3rd component if ever needed — Amber
-    )
-
-    // taxLines() eliminates the isHstProvince if-else duplication from this composable
-    data class Segment(val label: String, val amount: Double, val color: Color)
-    val segments = taxResult.taxLines().mapIndexed { i, line ->
-        Segment(line.label, line.amount, segmentColors.getOrElse(i) { segmentColors.last() })
-    }
-
-    if (segments.isEmpty()) return
-
-    val totalTax = segments.sumOf { it.amount }
-    if (totalTax <= 0) return
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Donut canvas: draw each segment sequentially
-        Canvas(modifier = Modifier.size(120.dp)) {
-            val strokeWidth = 24.dp.toPx()
-            var startAngle = -90f
-            // Grey background ring
-            drawArc(
-                color = Color(0xFFE0E0E0),
-                startAngle = -90f,
-                sweepAngle = 360f,
-                useCenter = false,
-                style = Stroke(width = strokeWidth, cap = StrokeCap.Butt)
-            )
-            // Colored segments
-            segments.forEach { seg ->
-                val sweep = (seg.amount / totalTax).toFloat() * 360f
-                drawArc(
-                    color = seg.color,
-                    startAngle = startAngle,
-                    sweepAngle = sweep,
-                    useCenter = false,
-                    style = Stroke(width = strokeWidth, cap = StrokeCap.Butt)
-                )
-                startAngle += sweep
-            }
-        }
-
-        Spacer(Modifier.width(20.dp))
-
-        // Legend
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            segments.forEach { seg ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Canvas(modifier = Modifier.size(10.dp)) {
-                        drawCircle(color = seg.color)
-                    }
-                    Spacer(Modifier.width(6.dp))
-                    Column {
-                        Text(
-                            seg.label,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            CurrencyFormatter.formatAmount(seg.amount),
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
                 }
             }
         }

@@ -68,8 +68,11 @@ class MainActivity : ComponentActivity() {
                 }
             },
             { requestError ->
-                // Request failed — proceed conservatively without ads
+                // Request failed — still try to initialize ads if consent already granted
                 if (BuildConfig.DEBUG) Log.w("UMP", "Consent info update failed: ${requestError.message}")
+                if (consentInfo.canRequestAds()) {
+                    initializeAds()
+                }
             }
         )
     }

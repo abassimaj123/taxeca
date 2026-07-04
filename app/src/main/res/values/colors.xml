@@ -13,4 +13,11 @@
     <color name="card_border">#E0E0E0</color>
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>
+
+    <!-- Widget colors (day) -->
+    <color name="widget_background_color">#FFFFFFFF</color>
+    <color name="widget_stroke_color">#E0E0E0</color>
+    <color name="widget_text_primary">#222222</color>
+    <color name="widget_text_secondary">#555555</color>
+    <color name="widget_text_accent">#C62828</color>
 </resources>

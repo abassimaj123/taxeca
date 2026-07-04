@@ -5,10 +5,12 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import com.taxeca.calculator.MainActivity
 import com.taxeca.calculator.R
+import com.taxeca.calculator.data.repository.LanguageManager
 import com.taxeca.calculator.domain.model.Province
 import java.text.NumberFormat
 import java.util.Locale
@@ -23,6 +25,17 @@ class TaxeCAWidget : AppWidgetProvider() {
         for (appWidgetId in appWidgetIds) {
             updateWidget(context, appWidgetManager, appWidgetId)
         }
+    }
+
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: Bundle
+    ) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+        // Re-render content when the user resizes the widget (min width/height changed).
+        updateWidget(context, appWidgetManager, appWidgetId)
     }
 
     companion object {
@@ -43,11 +56,19 @@ class TaxeCAWidget : AppWidgetProvider() {
                 WidgetConfigActivity.keyAmount(appWidgetId),
                 100f
             ).toDouble()
-            val lang = prefs.getString(
-                WidgetConfigActivity.keyLang(appWidgetId),
-                "fr"
-            ) ?: "fr"
-            val useFrench = lang == "fr"
+            // Prefer the app-wide language preference (kept in sync with the in-app
+            // language picker) so the widget never drifts from a value captured once
+            // at widget-configure time. Fall back to the current system locale, and
+            // only use the widget's own stored flag as a last resort.
+            val appLangPrefs = context.getSharedPreferences(LanguageManager.PREFS_NAME, Context.MODE_PRIVATE)
+            val appLang = appLangPrefs.getString(LanguageManager.KEY_LANG, null)
+            val systemLang = context.resources.configuration.locales[0].language
+            val widgetLang = prefs.getString(WidgetConfigActivity.keyLang(appWidgetId), null)
+            val useFrench = when {
+                appLang != null -> appLang.startsWith("fr")
+                widgetLang != null -> widgetLang == "fr"
+                else -> systemLang == "fr"
+            }
 
             val province = Province.fromCode(provinceCode)
             val provinceName = if (useFrench) province.nameFr else province.nameEn
@@ -78,6 +99,8 @@ class TaxeCAWidget : AppWidgetProvider() {
             views.setTextViewText(R.id.widget_province, provinceName)
             views.setTextViewText(R.id.widget_amount, CAD_FORMAT.format(amount))
             views.setTextViewText(R.id.widget_total_value, CAD_FORMAT.format(totalAmount))
+            views.setTextViewText(R.id.widget_total_label, if (useFrench) "Total TTC" else "Total")
+            views.setTextViewText(R.id.widget_open_btn, if (useFrench) "Ouvrir" else "Open")
 
             if (province.isHstProvince) {
                 // Line 1: HST

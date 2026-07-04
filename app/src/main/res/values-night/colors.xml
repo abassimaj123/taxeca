@@ -5,4 +5,11 @@
     <color name="card_border">#3D0000</color>
     <color name="text_primary">#FFE5E5</color>
     <color name="text_secondary">#C49090</color>
+
+    <!-- Widget colors (night) -->
+    <color name="widget_background_color">#FF1E1E1E</color>
+    <color name="widget_stroke_color">#2C2C2C</color>
+    <color name="widget_text_primary">#E0E0E0</color>
+    <color name="widget_text_secondary">#B0B0B0</color>
+    <color name="widget_text_accent">#EF5350</color>
 </resources>

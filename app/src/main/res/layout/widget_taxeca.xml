@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:padding="12dp">
+    android:padding="10dp">
 
     <!-- Header row: title + province -->
     <LinearLayout
@@ -20,8 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="TaxeCA 🍁"
-            android:textColor="#C62828"
-            android:textSize="14sp"
+            android:textColor="@color/widget_text_accent"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <TextView
@@ -29,8 +29,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Québec"
-            android:textColor="#555555"
-            android:textSize="12sp"
+            android:textColor="@color/widget_text_secondary"
+            android:textSize="11sp"
             android:textStyle="italic" />
     </LinearLayout>
 
@@ -42,8 +42,8 @@
         android:layout_below="@id/widget_header"
         android:layout_marginTop="2dp"
         android:text="$100.00"
-        android:textColor="#222222"
-        android:textSize="13sp"
+        android:textColor="@color/widget_text_primary"
+        android:textSize="12sp"
         android:textStyle="bold" />
 
     <!-- Divider -->
@@ -53,7 +53,7 @@
         android:layout_height="1dp"
         android:layout_below="@id/widget_amount"
         android:layout_marginTop="6dp"
-        android:background="#E0E0E0" />
+        android:background="@color/widget_stroke_color" />
 
     <!-- Results block -->
     <LinearLayout
@@ -77,16 +77,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="GST (5%)"
-                android:textColor="#555555"
-                android:textSize="11sp" />
+                android:textColor="@color/widget_text_secondary"
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/widget_tax1_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="$5.00"
-                android:textColor="#222222"
-                android:textSize="11sp"
+                android:textColor="@color/widget_text_primary"
+                android:textSize="10sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -103,16 +103,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="QST (9.975%)"
-                android:textColor="#555555"
-                android:textSize="11sp" />
+                android:textColor="@color/widget_text_secondary"
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/widget_tax2_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="$9.98"
-                android:textColor="#222222"
-                android:textSize="11sp"
+                android:textColor="@color/widget_text_primary"
+                android:textSize="10sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -128,9 +128,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:id="@+id/widget_total_label"
                 android:text="Total TTC"
-                android:textColor="#C62828"
-                android:textSize="13sp"
+                android:textColor="@color/widget_text_accent"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -138,8 +139,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="$114.98"
-                android:textColor="#C62828"
-                android:textSize="13sp"
+                android:textColor="@color/widget_text_accent"
+                android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
@@ -152,11 +153,11 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:background="@drawable/widget_button_bg"
-        android:paddingHorizontal="10dp"
-        android:paddingVertical="4dp"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="3dp"
         android:text="Ouvrir"
-        android:textColor="#FFFFFF"
-        android:textSize="11sp"
+        android:textColor="@color/white"
+        android:textSize="10sp"
         android:textStyle="bold" />
 
 </RelativeLayout>

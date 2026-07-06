@@ -267,16 +267,13 @@ fun HistoryDetailScreen(
                         valueWeight = FontWeight.SemiBold
                     )
 
-                    // Restaurant tip
-                    if (entity.mode == "RESTAURANT") {
-                        val tip = entity.totalAmount - entity.baseAmount - entity.totalTax
-                        if (tip > 0.005) {
-                            DetailEntryRow(
-                                stringResource(R.string.history_detail_tip),
-                                fmt(tip),
-                                valueWeight = FontWeight.SemiBold
-                            )
-                        }
+                    // Tip (restaurant or calculator-with-tip)
+                    if (entity.tipAmount > 0.005) {
+                        DetailEntryRow(
+                            stringResource(R.string.history_detail_tip),
+                            fmt(entity.tipAmount),
+                            valueWeight = FontWeight.SemiBold
+                        )
                     }
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
@@ -494,10 +491,8 @@ private fun buildDetailShareText(
         }
         if (province.isHstProvince && entity.hstAmount > 0)
             appendLine(dlv("TVH/HST (${pct(province.hstRate)})", fmt(entity.hstAmount)))
-        if (entity.mode == "RESTAURANT") {
-            val tip = entity.totalAmount - entity.baseAmount - entity.totalTax
-            if (tip > 0.005)
-                appendLine(dlv(if (isFr) "Pourboire / Tip" else "Tip / Pourboire", fmt(tip)))
+        if (entity.tipAmount > 0.005) {
+            appendLine(dlv(if (isFr) "Pourboire / Tip" else "Tip / Pourboire", fmt(entity.tipAmount)))
         }
         appendLine(sep)
         appendLine(dlv("TOTAL", fmt(entity.totalAmount)))

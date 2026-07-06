@@ -16,6 +16,7 @@ data class HistoryEntity(
     val hstAmount: Double,
     val totalTax: Double,
     val totalAmount: Double,
+    val tipAmount: Double = 0.0,
     val splitCount: Int = 1,
     val timestamp: Long = System.currentTimeMillis(),
     val itemsJson: String? = null   // JSON array of {name, price} for SHOPPING / RESTAURANT item-mode

@@ -18,9 +18,15 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     }
 }
 
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE calculations ADD COLUMN tipAmount REAL NOT NULL DEFAULT 0.0")
+    }
+}
+
 @Database(
     entities = [HistoryEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class HistoryDatabase : RoomDatabase() {

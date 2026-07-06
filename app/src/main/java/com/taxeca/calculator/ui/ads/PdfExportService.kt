@@ -179,13 +179,10 @@ class PdfExportService @Inject constructor(
         row(if (fr) "Total des taxes" else "Total Tax", fmt.format(e.totalTax))
         y += 10f
 
-        // ── Tip (Restaurant) ────────────────────────────────────────────────
-        if (e.mode == "RESTAURANT") {
-            val tip = e.totalAmount - e.baseAmount - e.totalTax
-            if (tip > 0.005) {
-                row(if (fr) "Pourboire" else "Tip", fmt.format(tip))
-                y += 6f
-            }
+        // ── Tip (Restaurant or Calculator-with-tip) ──────────────────────────
+        if (e.tipAmount > 0.005) {
+            row(if (fr) "Pourboire" else "Tip", fmt.format(e.tipAmount))
+            y += 6f
         }
 
         // ── Total ────────────────────────────────────────────────────────────

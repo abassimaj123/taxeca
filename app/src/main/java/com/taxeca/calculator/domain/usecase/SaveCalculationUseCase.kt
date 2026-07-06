@@ -13,7 +13,7 @@ import javax.inject.Inject
 class SaveCalculationUseCase @Inject constructor(
     private val repo: HistoryRepository
 ) {
-    suspend operator fun invoke(result: TaxResult, splitCount: Int = 1) {
+    suspend operator fun invoke(result: TaxResult, splitCount: Int = 1, tipAmount: Double = 0.0) {
         repo.save(HistoryEntity(
             provinceCode = result.province.code,
             mode         = result.mode.name,
@@ -23,7 +23,8 @@ class SaveCalculationUseCase @Inject constructor(
             pstAmount    = result.pstAmount,
             hstAmount    = result.hstAmount,
             totalTax     = result.totalTax,
-            totalAmount  = result.totalAmount,
+            totalAmount  = result.totalAmount + tipAmount,
+            tipAmount    = tipAmount,
             splitCount   = splitCount
         ))
     }
@@ -54,6 +55,7 @@ class SaveCalculationUseCase @Inject constructor(
             hstAmount    = result.hstAmount,
             totalTax     = result.totalTax,
             totalAmount  = result.total,
+            tipAmount    = result.tipAmount,
             splitCount   = result.splitCount,
             itemsJson    = if (items.isNotEmpty()) serializeItems(items) else null
         ))

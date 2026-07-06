@@ -188,8 +188,9 @@ class CalculatorViewModel @Inject constructor(
     fun saveToHistory() {
         val result = _taxResult.value ?: return
         val split  = if (_splitEnabled.value) _splitCount.value else 1
+        val tip    = tipAmount.value
         viewModelScope.launch {
-            saveCalculation(result, splitCount = split)
+            saveCalculation(result, splitCount = split, tipAmount = tip)
             _saveConfirmed.value = true
             delay(1_500)
             resetDisplay()

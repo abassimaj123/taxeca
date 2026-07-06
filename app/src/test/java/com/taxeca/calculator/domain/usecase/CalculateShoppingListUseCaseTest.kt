@@ -75,15 +75,15 @@ class CalculateShoppingListUseCaseTest {
 
     // ── Manitoba RST ──────────────────────────────────────────────────────────
 
-    @Test fun `MB single item 100 GST 5 RST 12`() {
+    @Test fun `MB single item 100 GST 5 RST 7`() {
         val items = listOf(
             ShoppingItem(price = 100.0, displayName = "Item A")
         )
         val result = useCase(items, Province.MB)
         assertEquals(100.0, result.subtotal, DELTA)
         assertEquals(5.0,   result.totalGst, DELTA)
-        assertEquals(12.0,  result.totalPst, DELTA)  // Manitoba RST 12%
-        assertEquals(117.0, result.grandTotal, DELTA)
+        assertEquals(7.0,   result.totalPst, DELTA)  // Manitoba RST 7% (since 2019-07-01)
+        assertEquals(112.0, result.grandTotal, DELTA)
     }
 
     // ── Empty Cart ────────────────────────────────────────────────────────────

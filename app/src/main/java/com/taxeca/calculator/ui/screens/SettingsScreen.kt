@@ -60,6 +60,7 @@ fun SettingsScreen(
     val freemiumVm = LocalFreemiumViewModel.current
     val isPremium  by freemiumVm.isPremium.collectAsStateWithLifecycle()
     val isFrench   by languageManager.isFrench.collectAsStateWithLifecycle()
+    val themeMode  by viewModel.themeMode.collectAsStateWithLifecycle()
     val context    = LocalContext.current
     val activity   = context as? android.app.Activity
 
@@ -118,6 +119,37 @@ fun SettingsScreen(
             ) {
                 Icon(Icons.Outlined.Language, contentDescription = stringResource(R.string.desc_language_icon), modifier = Modifier.padding(end = 6.dp))
                 Text("English", fontWeight = FontWeight.Medium)
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        HorizontalDivider()
+
+        // ── Theme ─────────────────────────────────────────────────────────────
+        SectionHeader(stringResource(R.string.settings_theme))
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            listOf(
+                "auto"  to stringResource(R.string.settings_theme_auto),
+                "dark"  to stringResource(R.string.settings_theme_dark),
+                "light" to stringResource(R.string.settings_theme_light)
+            ).forEachIndexed { index, (mode, label) ->
+                if (index > 0) Spacer(Modifier.width(8.dp))
+                OutlinedButton(
+                    onClick  = { viewModel.setThemeMode(mode) },
+                    modifier = Modifier.weight(1f),
+                    colors   = ButtonDefaults.outlinedButtonColors(
+                        containerColor = if (themeMode == mode) MaterialTheme.colorScheme.primary
+                                         else MaterialTheme.colorScheme.surface,
+                        contentColor   = if (themeMode == mode) MaterialTheme.colorScheme.onPrimary
+                                         else MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
+                    Text(label, fontWeight = FontWeight.Medium)
+                }
             }
         }
         Spacer(Modifier.height(8.dp))

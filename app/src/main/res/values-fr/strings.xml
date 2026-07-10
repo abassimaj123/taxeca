@@ -114,7 +114,7 @@
     <!-- Restaurant mode -->
     <string name="restaurant_subtotal_hint">Sous-total (avant taxes)</string>
     <string name="restaurant_tip_label">Pourboire</string>
-    <string name="restaurant_tip_custom">Personnalisé</string>
+    <string name="restaurant_tip_custom">Autre</string>
     <string name="calculator_tip_toggle">Inclure pourboire</string>
     <string name="calculator_tip_percent">Pourboire %</string>
     <string name="restaurant_tip_custom_hint">Pourboire personnalisé (%)</string>

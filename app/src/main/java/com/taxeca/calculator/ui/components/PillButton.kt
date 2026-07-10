@@ -47,7 +47,7 @@ fun PillButton(
                 style     = MaterialTheme.typography.labelLarge,
                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
                 maxLines  = 1,
-                overflow  = TextOverflow.Visible
+                overflow  = TextOverflow.Ellipsis
             )
         }
     }

@@ -26,7 +26,6 @@ import com.taxeca.calculator.ui.theme.GradientEnd
 import com.taxeca.calculator.ui.theme.GradientStart
 
 private val defaultGradient = Brush.horizontalGradient(listOf(GradientStart, GradientEnd))
-private val disabledGradient = Brush.horizontalGradient(listOf(Color(0xFFBDBDBD), Color(0xFFBDBDBD)))
 private val buttonShape = RoundedCornerShape(28.dp)
 
 @Composable
@@ -37,12 +36,16 @@ fun GradientButton(
     enabled: Boolean = true
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+    // Disabled colors are theme-aware (M3 standard 12%/38% onSurface alpha) so
+    // the button doesn't render as a static light-gray pill in dark mode.
+    val disabledContainer = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+    val disabledContent = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
     Box(
         modifier = modifier
             .height(52.dp)
             .shadow(if (enabled) 6.dp else 0.dp, buttonShape)
             .clip(buttonShape)
-            .background(if (enabled) defaultGradient else disabledGradient)
+            .background(if (enabled) defaultGradient else Brush.horizontalGradient(listOf(disabledContainer, disabledContainer)))
             .clickable(
                 enabled = enabled,
                 onClick = onClick,
@@ -57,7 +60,7 @@ fun GradientButton(
     ) {
         Text(
             text = text,
-            color = if (enabled) Color.White else Color(0xFF757575),
+            color = if (enabled) Color.White else disabledContent,
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.SemiBold
         )

@@ -116,7 +116,7 @@
     <!-- Restaurant mode -->
     <string name="restaurant_subtotal_hint">Bill subtotal (before tax)</string>
     <string name="restaurant_tip_label">Tip</string>
-    <string name="restaurant_tip_custom">Custom</string>
+    <string name="restaurant_tip_custom">Other</string>
     <string name="calculator_tip_toggle">Include tip</string>
     <string name="calculator_tip_percent">Tip %</string>
     <string name="restaurant_tip_custom_hint">Custom tip (%)</string>

@@ -2,6 +2,7 @@ package com.taxeca.calculator.ui.screens
 
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.compose.foundation.layout.Box
@@ -60,10 +61,31 @@ fun SettingsScreen(
     val freemiumVm = LocalFreemiumViewModel.current
     val isPremium  by freemiumVm.isPremium.collectAsStateWithLifecycle()
     val isFrench   by languageManager.isFrench.collectAsStateWithLifecycle()
+    val iapError    by freemiumVm.iapError.collectAsStateWithLifecycle()
+    val restoreNone by freemiumVm.restoreNoneFound.collectAsStateWithLifecycle()
     val context    = LocalContext.current
     val activity   = context as? android.app.Activity
 
     LaunchedEffect(Unit) { viewModel.logScreenView() }
+
+    // Show toast on restore — no purchase found
+    LaunchedEffect(restoreNone) {
+        if (restoreNone) {
+            Toast.makeText(context, context.getString(R.string.restore_none_found),
+                Toast.LENGTH_SHORT).show()
+            freemiumVm.clearRestoreNone()
+        }
+    }
+
+    // Show toast on IAP error (pending = deferred payment, distinct message)
+    LaunchedEffect(iapError) {
+        iapError?.let { reason ->
+            val msgRes = if (reason == "pending") R.string.iap_pending
+                         else R.string.iap_error_generic
+            Toast.makeText(context, context.getString(msgRes), Toast.LENGTH_SHORT).show()
+            freemiumVm.clearIapError()
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),

@@ -100,6 +100,12 @@ fun ShoppingScreen(
 
     LaunchedEffect(Unit) { viewModel.logScreenView() }
 
+    // Count each settled calculation toward the interstitial-ad frequency gate
+    // (was Save/Share-only, which most users never tap — see CalculatorScreen).
+    LaunchedEffect(listResult) {
+        if (listResult != null) freemiumVm.trackCalculation(context)
+    }
+
     // recordAction() called on Save button and tab navigation (not on every auto-recalculate)
 
     val priceFocus = remember { FocusRequester() }
@@ -290,7 +296,6 @@ fun ShoppingScreen(
                         OutlinedButton(
                             onClick  = {
                                 viewModel.saveToHistory()
-                                freemiumVm.trackCalculation(context)
                                 freemiumVm.recordAction()
                             },
                             enabled  = hasResult && !saveConfirmed,
@@ -337,7 +342,6 @@ fun ShoppingScreen(
                     )
                 )
                 viewModel.logShare()
-                freemiumVm.trackCalculation(context)
                 viewModel.saveToHistory()
                 viewModel.resetDisplay()
                 pendingShareText = null

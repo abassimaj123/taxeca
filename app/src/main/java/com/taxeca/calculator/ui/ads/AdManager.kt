@@ -106,11 +106,15 @@ class AdManager @Inject constructor(
     fun showRewarded(
         ad: RewardedAd,
         activity: Activity,
+        onShown: () -> Unit = {},
         onRewarded: () -> Unit,
         onDismissedWithoutReward: () -> Unit
     ) {
         var rewarded = false
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdShowedFullScreenContent() {
+                onShown()
+            }
             override fun onAdDismissedFullScreenContent() {
                 if (rewarded) onRewarded() else onDismissedWithoutReward()
             }

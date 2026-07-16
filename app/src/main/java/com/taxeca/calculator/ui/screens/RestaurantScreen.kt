@@ -110,6 +110,12 @@ fun RestaurantScreen(
 
     LaunchedEffect(Unit) { viewModel.logScreenView() }
 
+    // Count each settled calculation toward the interstitial-ad frequency gate
+    // (was Save/Share-only, which most users never tap — see CalculatorScreen).
+    LaunchedEffect(result) {
+        if (result != null) freemiumVm.trackCalculation(ctx)
+    }
+
     // recordAction() called on Save button and tab navigation (not on every auto-recalculate)
 
     val fmt: (Double) -> String = { CurrencyFormatter.formatAmount(it) }
@@ -456,7 +462,6 @@ fun RestaurantScreen(
                             OutlinedButton(
                                 onClick  = {
                                     viewModel.saveToHistory()
-                                    freemiumVm.trackCalculation(ctx)
                                     freemiumVm.recordAction()
                                 },
                                 enabled  = hasResult && !saveConfirmed,
@@ -504,7 +509,6 @@ fun RestaurantScreen(
                     )
                 )
                 viewModel.logShare()
-                freemiumVm.trackCalculation(ctx)
                 viewModel.saveToHistory()
                 viewModel.resetDisplay()
                 pendingShareText = null

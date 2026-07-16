@@ -112,6 +112,14 @@ fun CalculatorScreen(
         }
     }
 
+    // Count each settled calculation toward the interstitial-ad frequency gate.
+    // Was previously wired to Save/Share only, which most users never tap —
+    // this key already debounces via CalculatorViewModel.scheduleCalculation's
+    // 300ms delay, so it doesn't fire per-keystroke.
+    LaunchedEffect(taxResult) {
+        if (taxResult != null) freemiumVm.trackCalculation(context)
+    }
+
     // recordAction() called on Save button and tab navigation (not on every auto-recalculate)
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
@@ -376,7 +384,6 @@ fun CalculatorScreen(
                 OutlinedButton(
                     onClick  = {
                         viewModel.saveToHistory()
-                        freemiumVm.trackCalculation(context)
                         freemiumVm.recordAction()
                         freemiumVm.maybeRequestReview(context as android.app.Activity)
                     },
@@ -441,7 +448,6 @@ fun CalculatorScreen(
                 )
                 taxResult?.let { r ->
                     viewModel.logShareResult(r.province.code, "text")
-                    freemiumVm.trackCalculation(context)
                     viewModel.saveToHistory()
                     viewModel.resetDisplay()
                 }

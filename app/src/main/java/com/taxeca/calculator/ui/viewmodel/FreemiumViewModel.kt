@@ -192,10 +192,10 @@ class FreemiumViewModel @Inject constructor(
         adManager.loadRewarded(
             onLoaded = { ad ->
                 _isLoadingAd.value = false
-                analytics.log("rewarded_ad_shown")
                 adManager.showRewarded(
                     ad = ad,
                     activity = activity,
+                    onShown = { analytics.log("rewarded_ad_shown") },
                     onRewarded = {
                         analytics.log("rewarded_ad_completed")
                         viewModelScope.launch {
@@ -227,10 +227,10 @@ class FreemiumViewModel @Inject constructor(
         adManager.loadRewarded(
             onLoaded = { ad ->
                 _isLoadingAd.value = false
-                analytics.log("rewarded_ad_shown")
                 adManager.showRewarded(
                     ad = ad,
                     activity = activity,
+                    onShown = { analytics.log("rewarded_ad_shown") },
                     onRewarded = {
                         analytics.log("rewarded_ad_completed")
                         viewModelScope.launch {

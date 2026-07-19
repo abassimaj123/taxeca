@@ -7,15 +7,9 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.ump.ConsentRequestParameters
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import com.google.android.ump.UserMessagingPlatform
 import com.taxeca.calculator.data.repository.LanguageManager
-import com.taxeca.calculator.ui.ads.AdConfig
 import com.taxeca.calculator.ui.navigation.AppNavigation
 import com.taxeca.calculator.ui.theme.TaxeCATheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,10 +38,13 @@ class MainActivity : ComponentActivity() {
                 AppNavigation()
             }
         }
-        requestConsentAndInitAds()
+        requestConsent()
     }
 
-    private fun requestConsentAndInitAds() {
+    // MobileAds.initialize() now lives in TaxeCAApplication.onCreate(), unconditional
+    // and ahead of any ViewModel — see the comment there for why. This only handles
+    // showing the UMP consent form itself, which needs an Activity to render into.
+    private fun requestConsent() {
         val params = ConsentRequestParameters.Builder()
             .setTagForUnderAgeOfConsent(false)
             .build()
@@ -55,50 +52,15 @@ class MainActivity : ComponentActivity() {
         val consentInfo = UserMessagingPlatform.getConsentInformation(this)
         consentInfo.requestConsentInfoUpdate(this, params,
             {
-                // Success — load consent form if required
                 UserMessagingPlatform.loadAndShowConsentFormIfRequired(this) { formError ->
                     if (formError != null) {
-                        // Log error but proceed — don't block app
                         if (BuildConfig.DEBUG) Log.w("UMP", "Consent form error: ${formError.message}")
-                    }
-                    // Initialize ads only if consent obtained OR not required
-                    if (consentInfo.canRequestAds()) {
-                        initializeAds()
                     }
                 }
             },
             { requestError ->
-                // Request failed — still try to initialize ads if consent already granted
                 if (BuildConfig.DEBUG) Log.w("UMP", "Consent info update failed: ${requestError.message}")
-                if (consentInfo.canRequestAds()) {
-                    initializeAds()
-                }
             }
         )
-    }
-
-    private fun initializeAds() {
-        if (!AdConfig.ADS_ENABLED) return
-        // Register QA/dev devices so real-ad impressions during internal release
-        // testing aren't counted as invalid clicks (AdMob account-safety).
-        // The hash is NOT the adb serial — copy it from logcat on first ad load:
-        //   "Use RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList(\"<HASH>\"))"
-        // then paste it into TEST_DEVICE_IDS for release QA builds.
-        if (TEST_DEVICE_IDS.isNotEmpty()) {
-            MobileAds.setRequestConfiguration(
-                RequestConfiguration.Builder().setTestDeviceIds(TEST_DEVICE_IDS).build()
-            )
-        }
-        // initialize() does disk/network I/O on first run — keep it off the UI thread
-        // to avoid startup jank.
-        lifecycleScope.launch(Dispatchers.IO) {
-            MobileAds.initialize(this@MainActivity) {}
-        }
-    }
-
-    private companion object {
-        // Paste AdMob test-device hashes (from logcat) for release QA. Empty = none.
-        // Debug builds already use Google test ad-unit IDs, so no real impressions there.
-        val TEST_DEVICE_IDS = emptyList<String>()
     }
 }

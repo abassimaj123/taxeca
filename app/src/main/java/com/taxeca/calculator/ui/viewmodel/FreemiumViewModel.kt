@@ -191,11 +191,17 @@ class FreemiumViewModel @Inject constructor(
         _isLoadingAd.value = true
         adManager.loadRewarded(
             onLoaded = { ad ->
-                _isLoadingAd.value = false
                 adManager.showRewarded(
                     ad = ad,
                     activity = activity,
-                    onShown = { analytics.log("rewarded_ad_shown") },
+                    onShown = {
+                        // Only clear the loading state once the ad is actually on
+                        // screen — clearing it right after load() (as before) let
+                        // the button/spinner flip back to "ready" during the brief
+                        // window where .show() could still silently fail.
+                        _isLoadingAd.value = false
+                        analytics.log("rewarded_ad_shown")
+                    },
                     onRewarded = {
                         analytics.log("rewarded_ad_completed")
                         viewModelScope.launch {
@@ -204,7 +210,16 @@ class FreemiumViewModel @Inject constructor(
                             onGranted()
                         }
                     },
-                    onDismissedWithoutReward = {}
+                    onDismissedWithoutReward = {},
+                    onFailedToShow = {
+                        // Ad loaded (counted as an AdMob request) but .show() failed —
+                        // previously silent (empty lambda), root cause of "requests
+                        // with ~0 impressions" on the AdMob dashboard.
+                        _isLoadingAd.value = false
+                        _adUnavailable.value = true
+                        analytics.logRewardedAdFailed()
+                        if (BuildConfig.DEBUG) Log.d("FreemiumVM", "Rewarded ad failed to show")
+                    }
                 )
             },
             onFailed = {
@@ -226,11 +241,14 @@ class FreemiumViewModel @Inject constructor(
         _adUnavailable.value = false
         adManager.loadRewarded(
             onLoaded = { ad ->
-                _isLoadingAd.value = false
                 adManager.showRewarded(
                     ad = ad,
                     activity = activity,
-                    onShown = { analytics.log("rewarded_ad_shown") },
+                    onShown = {
+                        // See requestAccess() for why this moved from onLoaded to onShown.
+                        _isLoadingAd.value = false
+                        analytics.log("rewarded_ad_shown")
+                    },
                     onRewarded = {
                         analytics.log("rewarded_ad_completed")
                         viewModelScope.launch {
@@ -238,7 +256,12 @@ class FreemiumViewModel @Inject constructor(
                             refreshRewardedState()
                         }
                     },
-                    onDismissedWithoutReward = {}
+                    onDismissedWithoutReward = {},
+                    onFailedToShow = {
+                        _isLoadingAd.value = false
+                        _adUnavailable.value = true
+                        analytics.logRewardedAdFailed()
+                    }
                 )
             },
             onFailed = {

@@ -108,7 +108,8 @@ class AdManager @Inject constructor(
         activity: Activity,
         onShown: () -> Unit = {},
         onRewarded: () -> Unit,
-        onDismissedWithoutReward: () -> Unit
+        onDismissedWithoutReward: () -> Unit,
+        onFailedToShow: () -> Unit = {}
     ) {
         var rewarded = false
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
@@ -119,7 +120,12 @@ class AdManager @Inject constructor(
                 if (rewarded) onRewarded() else onDismissedWithoutReward()
             }
             override fun onAdFailedToShowFullScreenContent(error: AdError) {
-                onDismissedWithoutReward()
+                // Ad loaded successfully (already counted as an AdMob request) but
+                // .show() itself failed — distinct from onDismissedWithoutReward,
+                // which fires when the user closes an ad that DID render. Callers
+                // need this split to tell "silent show failure" apart from normal
+                // "watched partway, bailed out" behavior.
+                onFailedToShow()
             }
         }
         ad.show(activity) { _ -> rewarded = true }

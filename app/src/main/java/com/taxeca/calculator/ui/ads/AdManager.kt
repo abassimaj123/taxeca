@@ -11,6 +11,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.taxeca.calculator.data.repository.AdRepository
+import com.taxeca.calculator.ui.analytics.AnalyticsManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,8 @@ import javax.inject.Singleton
 @Singleton
 class AdManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val adRepo: AdRepository
+    private val adRepo: AdRepository,
+    private val analytics: AnalyticsManager
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -57,12 +59,20 @@ class AdManager @Inject constructor(
             AdRequest.Builder().build(),
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: InterstitialAd) {
+                    ad.onPaidEventListener = com.google.android.gms.ads.OnPaidEventListener { value ->
+                        analytics.logAdPaid(
+                            "interstitial", value.valueMicros, value.currencyCode,
+                            value.precisionType.toString()
+                        )
+                    }
                     interstitialAd = ad
                     isLoadingInterstitial = false
+                    analytics.logInterstitialLoaded()
                 }
                 override fun onAdFailedToLoad(error: LoadAdError) {
                     interstitialAd = null
                     isLoadingInterstitial = false
+                    analytics.logInterstitialLoadFailed()
                 }
             }
         )
@@ -77,6 +87,9 @@ class AdManager @Inject constructor(
             return
         }
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdShowedFullScreenContent() {
+                analytics.logInterstitialShown()
+            }
             override fun onAdDismissedFullScreenContent() {
                 interstitialAd = null
                 preloadInterstitial()
@@ -84,6 +97,7 @@ class AdManager @Inject constructor(
             }
             override fun onAdFailedToShowFullScreenContent(error: AdError) {
                 interstitialAd = null
+                analytics.logInterstitialShowFailed()
                 onDismissed()
             }
         }
@@ -97,7 +111,16 @@ class AdManager @Inject constructor(
             AdConfig.REWARDED_ID,
             AdRequest.Builder().build(),
             object : RewardedAdLoadCallback() {
-                override fun onAdLoaded(ad: RewardedAd) = onLoaded(ad)
+                override fun onAdLoaded(ad: RewardedAd) {
+                    ad.onPaidEventListener = com.google.android.gms.ads.OnPaidEventListener { value ->
+                        analytics.logAdPaid(
+                            "rewarded", value.valueMicros, value.currencyCode,
+                            value.precisionType.toString()
+                        )
+                    }
+                    analytics.logRewardedLoaded()
+                    onLoaded(ad)
+                }
                 override fun onAdFailedToLoad(error: LoadAdError) = onFailed()
             }
         )
@@ -125,6 +148,7 @@ class AdManager @Inject constructor(
                 // which fires when the user closes an ad that DID render. Callers
                 // need this split to tell "silent show failure" apart from normal
                 // "watched partway, bailed out" behavior.
+                analytics.logRewardedShowFailed()
                 onFailedToShow()
             }
         }

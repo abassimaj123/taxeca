@@ -19,7 +19,7 @@ lifecycleViewmodelCompose = "2.8.7"
 appcompat = "1.7.0"
 playServicesAds = "23.3.0"
 firebaseBom = "33.7.0"
-billing = "7.1.1"
+billing = "8.0.0"
 review = "2.0.2"
 googleServices = "4.4.2"
 

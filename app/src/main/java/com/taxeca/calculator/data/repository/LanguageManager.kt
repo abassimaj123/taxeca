@@ -2,6 +2,7 @@ package com.taxeca.calculator.data.repository
 
 import android.content.Context
 import android.content.res.Configuration
+import com.taxeca.calculator.ui.analytics.AnalyticsManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +12,8 @@ import javax.inject.Singleton
 
 @Singleton
 class LanguageManager @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val analytics: AnalyticsManager
 ) {
     companion object {
         const val PREFS_NAME = "taxeca_language"
@@ -37,9 +39,16 @@ class LanguageManager @Inject constructor(
     private val _isFrench = MutableStateFlow(savedLang == LANG_FR)
     val isFrench: StateFlow<Boolean> = _isFrench
 
+    init {
+        // Sync once at startup so DAU/retention can be filtered by language from
+        // day one, not only after the user explicitly switches.
+        analytics.setLanguage(if (_isFrench.value) "fr" else "en")
+    }
+
     fun setLanguage(lang: String) {
         prefs.edit().putString(KEY_LANG, lang).apply()
         _isFrench.value = (lang == LANG_FR)
+        analytics.setLanguage(if (_isFrench.value) "fr" else "en")
     }
 
     /** Apply saved locale to a Context (called from attachBaseContext). */

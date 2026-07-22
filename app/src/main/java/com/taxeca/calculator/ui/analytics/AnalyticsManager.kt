@@ -66,11 +66,53 @@ class AnalyticsManager @Inject constructor(
     }
 
     fun logPurchaseError(reason: String) = log("iap_purchase_error", "reason" to reason)
+    /** Product query failed (not found / billing unreachable) — distinct from
+     * [logPurchaseError], which fires only after the user actually taps buy.
+     * Fires earlier, when the product itself is unreachable — the signature
+     * of a broken Play Console config, otherwise invisible in GA4. */
+    fun logIapPriceUnavailable(reason: String) = log("iap_price_unavailable", "reason" to reason)
+
+    // Rewarded — split into load/show funnel steps (mirrors the Flutter portfolio's
+    // calcwise_core event vocabulary so AppPulse queries work identically across
+    // platforms). rewarded_ad_shown/completed/failed kept for dashboard continuity.
+    fun logRewardedOffered()     = log("rewarded_offered")
+    fun logRewardedLoaded()      = log("rewarded_loaded")
     fun logRewardedAdShown()     = log("rewarded_ad_shown")
     fun logRewardedAdCompleted() = log("rewarded_ad_completed")
     fun logRewardedAdFailed()    = log("rewarded_ad_failed")
+    /** Ad loaded (counted as an AdMob request) but .show() itself failed —
+     * distinct from a load failure, which self-heals on retry. */
+    fun logRewardedShowFailed()  = log("rewarded_show_failed")
     fun logRewardedDailyLimit()  = log("rewarded_daily_limit_reached")
+
+    // Interstitial funnel — previously not logged at all.
+    fun logInterstitialLoaded()     = log("interstitial_loaded")
+    fun logInterstitialLoadFailed() = log("interstitial_load_failed")
+    fun logInterstitialShown()      = log("interstitial_shown")
+    fun logInterstitialShowFailed() = log("interstitial_show_failed")
+
+    // Banner funnel — logBannerAdFailed() was defined but never called; kept for
+    // compat, logBannerLoadFailed() is the one actually wired now.
+    fun logBannerLoaded()        = log("banner_loaded")
+    fun logBannerLoadFailed()    = log("banner_load_failed")
     fun logBannerAdFailed()      = log("banner_ad_failed")
+
+    /** AdMob revenue attribution — fires on onPaidEvent for banner/interstitial/
+     * rewarded. Active users with real impressions but zero ad_paid rows is the
+     * signature of an ad unit resolving to Google's TEST id instead of the real
+     * one — directly cross-checkable against the AdMob console from GA4 alone. */
+    fun logAdPaid(format: String, valueMicros: Long, currencyCode: String, precision: String) =
+        log("ad_paid", "format" to format, "value_micros" to valueMicros,
+            "currency" to currencyCode, "precision" to precision)
+
+    /** Fires when the native review prompt is actually surfaced (not on every
+     * eligibility check) — lets AppPulse correlate prompt timing with the
+     * Play Console rating trend. */
+    fun logReviewRequested() = log("review_requested")
+
+    /** Persistent user property — enables filtering DAU/retention by language
+     * in the Firebase console / AppPulse. */
+    fun setLanguage(lang: String) = setUserProperty("app_language", lang)
 
     // ── Crashlytics helpers ───────────────────────────────────────────────────
 

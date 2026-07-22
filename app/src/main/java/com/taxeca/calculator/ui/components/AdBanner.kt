@@ -13,9 +13,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.OnPaidEventListener
 import com.taxeca.calculator.ui.ads.AdConfig
 import com.taxeca.calculator.ui.navigation.LocalFreemiumViewModel
 
@@ -48,6 +51,13 @@ fun AdBanner(modifier: Modifier = Modifier) {
                 AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, screenWidthDp)
             )
             adUnitId = AdConfig.BANNER_ID
+            adListener = object : AdListener() {
+                override fun onAdLoaded() = freemiumVm.logBannerLoaded()
+                override fun onAdFailedToLoad(error: LoadAdError) = freemiumVm.logBannerLoadFailed()
+            }
+            onPaidEventListener = OnPaidEventListener { value ->
+                freemiumVm.logBannerPaid(value.valueMicros, value.currencyCode, value.precisionType.toString())
+            }
             loadAd(AdRequest.Builder().build())
         }
     }

@@ -5,13 +5,15 @@ import android.content.Context
 import android.util.Log
 import com.taxeca.calculator.BuildConfig
 import com.google.android.play.core.review.ReviewManagerFactory
+import com.taxeca.calculator.ui.analytics.AnalyticsManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ReviewManager @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val analytics: AnalyticsManager
 ) {
     private companion object {
         const val TAG = "ReviewManager"
@@ -37,6 +39,7 @@ class ReviewManager @Inject constructor(
         request.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 prefs.edit().putBoolean(PREF_KEY, true).apply()
+                analytics.logReviewRequested()
                 manager.launchReviewFlow(activity, task.result)
                     .addOnCompleteListener {
                         if (BuildConfig.DEBUG) Log.d(TAG, "Review flow completed")

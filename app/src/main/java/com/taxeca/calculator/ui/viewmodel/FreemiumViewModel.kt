@@ -189,6 +189,7 @@ class FreemiumViewModel @Inject constructor(
         if (_hasAccess.value) { onGranted(); return }
         val activity = context.findActivity() ?: return
         _isLoadingAd.value = true
+        analytics.logRewardedOffered()
         adManager.loadRewarded(
             onLoaded = { ad ->
                 adManager.showRewarded(
@@ -200,6 +201,7 @@ class FreemiumViewModel @Inject constructor(
                         // the button/spinner flip back to "ready" during the brief
                         // window where .show() could still silently fail.
                         _isLoadingAd.value = false
+                        analytics.log("rewarded_started")
                         analytics.log("rewarded_ad_shown")
                     },
                     onRewarded = {
@@ -239,6 +241,7 @@ class FreemiumViewModel @Inject constructor(
         val activity = context.findActivity() ?: return
         _isLoadingAd.value = true
         _adUnavailable.value = false
+        analytics.logRewardedOffered()
         adManager.loadRewarded(
             onLoaded = { ad ->
                 adManager.showRewarded(
@@ -247,6 +250,7 @@ class FreemiumViewModel @Inject constructor(
                     onShown = {
                         // See requestAccess() for why this moved from onLoaded to onShown.
                         _isLoadingAd.value = false
+                        analytics.log("rewarded_started")
                         analytics.log("rewarded_ad_shown")
                     },
                     onRewarded = {
@@ -275,6 +279,14 @@ class FreemiumViewModel @Inject constructor(
     fun clearAdUnavailable() { _adUnavailable.value = false }
     fun clearIapError()      { _iapError.value = null }
 
+    // ── Banner ad instrumentation (forwarded — AdBanner is a Composable, not a
+    // ViewModel, and FreemiumViewModel is already accessible there via
+    // LocalFreemiumViewModel) ───────────────────────────────────────────────────
+    fun logBannerLoaded()      = analytics.logBannerLoaded()
+    fun logBannerLoadFailed()  = analytics.logBannerLoadFailed()
+    fun logBannerPaid(valueMicros: Long, currencyCode: String, precision: String) =
+        analytics.logAdPaid("banner", valueMicros, currencyCode, precision)
+
     // ── IAP ───────────────────────────────────────────────────────────────────
 
     fun buyPremium(activity: Activity) {
@@ -297,6 +309,13 @@ class FreemiumViewModel @Inject constructor(
                         // Deferred payment, not a failure — surface info, don't log as crash.
                         analytics.log("iap_purchase_pending")
                         _iapError.value = "pending"
+                    }
+                    "Product not found" -> {
+                        // Product query failed — a broken Play Console product config,
+                        // otherwise invisible in GA4 until a user hits this and gives up.
+                        analytics.logIapPriceUnavailable("not_found")
+                        analytics.logPurchaseError(reason)
+                        _iapError.value = reason
                     }
                     else -> {
                         analytics.logPurchaseError(reason)

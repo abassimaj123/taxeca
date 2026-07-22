@@ -422,7 +422,7 @@ fun RestaurantScreen(
                         )
                     }
                     PillButton(
-                        label    = stringResource(R.string.restaurant_tip_custom),
+                        label    = stringResource(R.string.restaurant_split_custom),
                         selected = customSplitInput.isNotEmpty() || splitCount > 4,
                         onClick  = { viewModel.onSplitSelected(5) },
                         modifier = Modifier.weight(1f)

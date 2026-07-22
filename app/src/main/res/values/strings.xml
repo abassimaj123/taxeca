@@ -3,14 +3,14 @@
     <string name="app_name">TaxeCA</string>
 
     <!-- Navigation tabs -->
-    <string name="tab_calculator">Calculator</string>
+    <string name="tab_calculator">Purchase</string>
     <string name="tab_history">History</string>
 
     <!-- Labels -->
     <string name="label_province">Province / Territory</string>
     <string name="label_amount">Amount</string>
-    <string name="label_mode_forward">HT (excl. tax)</string>
-    <string name="label_mode_reverse">TTC (incl. tax)</string>
+    <string name="label_mode_forward">Before tax</string>
+    <string name="label_mode_reverse">After tax (total)</string>
 
     <!-- Tax labels -->
     <string name="label_gst">GST</string>
@@ -116,13 +116,14 @@
     <!-- Restaurant mode -->
     <string name="restaurant_subtotal_hint">Bill subtotal (before tax)</string>
     <string name="restaurant_tip_label">Tip</string>
-    <string name="restaurant_tip_custom">Other</string>
+    <string name="restaurant_tip_custom">Other amount</string>
     <string name="calculator_tip_toggle">Include tip</string>
     <string name="calculator_tip_percent">Tip %</string>
     <string name="restaurant_tip_custom_hint">Custom tip (%)</string>
     <string name="restaurant_tip_with_rate">Tip (%1$s)</string>
     <string name="restaurant_split_label">Split bill</string>
     <string name="restaurant_no_split">No split</string>
+    <string name="restaurant_split_custom">Custom split</string>
     <string name="restaurant_split_custom_hint">Number of people</string>
     <string name="restaurant_per_person">Per person (÷%1$d)</string>
 
@@ -149,6 +150,13 @@
     <string name="tooltip_rst_body">Manitoba\'s provincial retail sales tax of 7%, applied on the base amount before GST.</string>
     <string name="tooltip_hst_title">HST — Harmonized Sales Tax</string>
     <string name="tooltip_hst_body" formatted="false">A single tax that combines the federal GST (5%) and the provincial portion into one rate. Applied in NB (15%), NL (15%), NS (14%), ON (13%), and PE (15%). Nova Scotia reduced its rate to 14% effective April 1, 2025 (down from 15%).</string>
+
+    <!-- Tax subtitles (persistent, non-tooltip explanation shown under each tax row) -->
+    <string name="gst_subtitle">Federal tax</string>
+    <string name="pst_subtitle">Provincial tax</string>
+    <string name="qst_subtitle">Quebec provincial tax</string>
+    <string name="rst_subtitle">Manitoba retail tax</string>
+    <string name="hst_subtitle">Combined federal + provincial tax</string>
     <string name="premium_gate_title">History locked</string>
     <string name="premium_gate_message">Watch an ad for 1 hour of access, or get Premium for unlimited history.</string>
 

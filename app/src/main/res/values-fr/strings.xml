@@ -3,7 +3,7 @@
     <string name="app_name">TaxeCA</string>
 
     <!-- Navigation tabs -->
-    <string name="tab_calculator">Calculatrice</string>
+    <string name="tab_calculator">Achat</string>
     <string name="tab_history">Historique</string>
 
     <!-- Labels -->
@@ -114,13 +114,14 @@
     <!-- Restaurant mode -->
     <string name="restaurant_subtotal_hint">Sous-total (avant taxes)</string>
     <string name="restaurant_tip_label">Pourboire</string>
-    <string name="restaurant_tip_custom">Autre</string>
+    <string name="restaurant_tip_custom">Autre montant</string>
     <string name="calculator_tip_toggle">Inclure pourboire</string>
     <string name="calculator_tip_percent">Pourboire %</string>
     <string name="restaurant_tip_custom_hint">Pourboire personnalisé (%)</string>
     <string name="restaurant_tip_with_rate">Pourboire (%1$s)</string>
     <string name="restaurant_split_label">Diviser l\'addition</string>
     <string name="restaurant_no_split">Sans division</string>
+    <string name="restaurant_split_custom">Partage personnalisé</string>
     <string name="restaurant_split_custom_hint">Nombre de personnes</string>
     <string name="restaurant_per_person">Par personne (÷%1$d)</string>
 
@@ -147,6 +148,13 @@
     <string name="tooltip_rst_body">Taxe provinciale de vente au détail du Manitoba de 7 %, appliquée sur le montant de base avant TPS.</string>
     <string name="tooltip_hst_title">TVH — Taxe de vente harmonisée</string>
     <string name="tooltip_hst_body" formatted="false">Une taxe unique combinant la part fédérale de la TPS (5 %) et la part provinciale en un seul taux. Applicable au N.-B. (15 %), T.-N.-L. (15 %), N.-É. (14 %), Ont. (13 %) et Î.-P.-É. (15 %). La Nouvelle-Écosse a réduit son taux à 14 % le 1er avril 2025 (baisse depuis 15 %).</string>
+
+    <!-- Sous-titres de taxe (explication persistante, non-tooltip, sous chaque ligne de taxe) -->
+    <string name="gst_subtitle">Taxe fédérale</string>
+    <string name="pst_subtitle">Taxe provinciale</string>
+    <string name="qst_subtitle">Taxe provinciale du Québec</string>
+    <string name="rst_subtitle">Taxe de détail du Manitoba</string>
+    <string name="hst_subtitle">Taxe combinée fédérale + provinciale</string>
     <string name="premium_gate_title">Historique verrouillé</string>
     <string name="premium_gate_message">Regardez une pub pour 1 heure d\'accès, ou obtenez Premium pour un historique illimité.</string>
 

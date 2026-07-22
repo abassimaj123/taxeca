@@ -82,6 +82,7 @@ fun ResultCard(
                                 CurrencyFormatter.formatPercent(taxResult.province.gstRate)
                             ),
                             value = CurrencyFormatter.formatAmount(taxResult.gstAmount),
+                            subtitle = stringResource(R.string.gst_subtitle),
                             tooltipTitle = stringResource(R.string.tooltip_gst_title),
                             tooltipBody  = stringResource(R.string.tooltip_gst_body)
                         )
@@ -90,14 +91,15 @@ fun ResultCard(
 
                     // PST / QST / RST line
                     if (!taxResult.province.isHstProvince && taxResult.province.pstRate > 0) {
-                        val (labelRes, titleRes, bodyRes) = when (taxResult.province.pstLabel) {
-                            "QST" -> Triple(R.string.label_qst_with_rate, R.string.tooltip_qst_title, R.string.tooltip_qst_body)
-                            "RST" -> Triple(R.string.label_rst_with_rate, R.string.tooltip_rst_title, R.string.tooltip_rst_body)
-                            else  -> Triple(R.string.label_pst_with_rate, R.string.tooltip_pst_title, R.string.tooltip_pst_body)
+                        val (labelRes, titleRes, bodyRes, subtitleRes) = when (taxResult.province.pstLabel) {
+                            "QST" -> QuadRes(R.string.label_qst_with_rate, R.string.tooltip_qst_title, R.string.tooltip_qst_body, R.string.qst_subtitle)
+                            "RST" -> QuadRes(R.string.label_rst_with_rate, R.string.tooltip_rst_title, R.string.tooltip_rst_body, R.string.rst_subtitle)
+                            else  -> QuadRes(R.string.label_pst_with_rate, R.string.tooltip_pst_title, R.string.tooltip_pst_body, R.string.pst_subtitle)
                         }
                         TaxRow(
                             label = stringResource(labelRes, CurrencyFormatter.formatPercent(taxResult.province.pstRate)),
                             value = CurrencyFormatter.formatAmount(taxResult.pstAmount),
+                            subtitle = stringResource(subtitleRes),
                             tooltipTitle = stringResource(titleRes),
                             tooltipBody  = stringResource(bodyRes)
                         )
@@ -112,6 +114,7 @@ fun ResultCard(
                                 CurrencyFormatter.formatPercent(taxResult.province.hstRate)
                             ),
                             value = CurrencyFormatter.formatAmount(taxResult.hstAmount),
+                            subtitle = stringResource(R.string.hst_subtitle),
                             tooltipTitle = stringResource(R.string.tooltip_hst_title),
                             tooltipBody  = stringResource(R.string.tooltip_hst_body)
                         )
@@ -158,10 +161,13 @@ fun ResultCard(
     }
 }
 
+private data class QuadRes(val label: Int, val title: Int, val body: Int, val subtitle: Int)
+
 @Composable
 private fun TaxRow(
     label: String,
     value: String,
+    subtitle: String? = null,
     tooltipTitle: String? = null,
     tooltipBody: String? = null,
     labelStyle: TextStyle = MaterialTheme.typography.bodyMedium,
@@ -185,24 +191,34 @@ private fun TaxRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(
-                text  = label,
-                style = labelStyle,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            if (tooltipTitle != null) {
-                Spacer(Modifier.size(4.dp))
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    contentDescription = tooltipTitle,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f),
-                    modifier = Modifier
-                        .size(14.dp)
-                        .clickable { showTooltip = true }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text  = label,
+                    style = labelStyle,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                if (tooltipTitle != null) {
+                    Spacer(Modifier.size(4.dp))
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = tooltipTitle,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f),
+                        modifier = Modifier
+                            .size(14.dp)
+                            .clickable { showTooltip = true }
+                    )
+                }
+            }
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
             }
         }
